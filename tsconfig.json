@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "composite": false,
+    "module": "esNext",
+    "target": "esNext",
+    "moduleResolution": "node",
+    "types": ["node", "jest"],
+    "declaration": true,
+    "noImplicitAny": false,
+    "esModuleInterop": true,
+    "preserveConstEnums": true,
+    "strictNullChecks": false,
+    "skipLibCheck": false,
+  },
+  "exclude": ["node_modules", "dist"]
+}

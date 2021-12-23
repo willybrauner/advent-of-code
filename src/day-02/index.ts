@@ -1,8 +1,9 @@
 const fs = require("fs")
 const path = require("path")
 
+export type TMovement = "up" | "down" | "forward"
 export type TInput = {
-  movement: "up" | "down" | "forward"
+  movement: TMovement
   value: number
 }
 
@@ -15,26 +16,23 @@ export const fileInputs: TInput[] = fs
     value: parseInt(x.split(" ")[1]),
   }))
 
-//console.log(fileInputs)
-export const calculatePositionAndDepth = (inputs: TInput[] = fileInputs) => {
-  const depth = inputs.reduce((acc, current: TInput) => {
-    if (current.movement === "down") {
-      acc += current.value
-    }
-    if (current.movement === "up") {
-      acc -= current.value
-    }
-    return acc
-  }, 0)
+/**
+ * Part 1
+ * @param values
+ * @returns
+ */
+export const getMovementValue = (movement: TMovement, inputs = fileInputs): number =>
+  inputs.reduce(
+    (acc: number, curr: TInput) =>
+      curr.movement === movement ? (acc += curr.value) : acc,
+    0
+  )
+export const part1Result =
+  (getMovementValue("down") - getMovementValue("up")) * getMovementValue("forward")
 
-  const horizontalPostion = inputs.reduce((acc, current: TInput) => {
-    if (current.movement === "forward") {
-      acc += current.value
-    }
-    return acc
-  }, 0)
+  /**
+   * Part 2
+   * 
+   */
 
-  return horizontalPostion * depth
-}
-
-console.log("position", calculatePositionAndDepth())
+  

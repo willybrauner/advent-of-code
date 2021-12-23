@@ -27,12 +27,29 @@ export const getMovementValue = (movement: TMovement, inputs = fileInputs): numb
       curr.movement === movement ? (acc += curr.value) : acc,
     0
   )
+// multiply final horizontal position by final depth
 export const part1Result =
-  (getMovementValue("down") - getMovementValue("up")) * getMovementValue("forward")
+  getMovementValue("forward") * (getMovementValue("down") - getMovementValue("up"))
 
-  /**
-   * Part 2
-   * 
-   */
+/**
+ * Part 2
+ */
+export const calcPart2 = (inputs: TInput[] = fileInputs): number => {
+  let aim = 0
+  let horizontalPosition = 0
+  let depth = 0
 
-  
+  for (const input of inputs) {
+    if (input.movement === "down") {
+      aim += input.value
+    }
+    if (input.movement === "up") {
+      aim -= input.value
+    }
+    if (input.movement === "forward") {
+      depth += aim * input.value
+      horizontalPosition += input.value
+    }
+  }
+  return horizontalPosition * depth
+}

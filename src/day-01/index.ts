@@ -1,7 +1,8 @@
 const fs = require("fs")
+const path = require("path")
 
 export const fileInputs = fs
-  .readFileSync("inputs.txt", "utf8")
+  .readFileSync(path.resolve(__dirname, "inputs.txt"), "utf8")
   .split(/\n/)
   .filter((v) => v)
   .map((x) => parseInt(x))

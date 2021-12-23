@@ -1,6 +1,10 @@
 {
-  "name": "root",
-  "private": true,
+  "name": "avent-of-code-2021",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "jest --watchAll",
+    "test": "jest"
+  },
   "devDependencies": {
     "@types/jest": "^27.0.3",
     "@types/node": "^16.11.6",
@@ -12,6 +16,5 @@
     "@babel/preset-env": "^7.16.5",
     "@babel/preset-typescript": "^7.16.5",
     "babel-jest": "^27.4.5"
-  },
-  "version": "1.0.0"
+  }
 }

@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "strict": false,
     "composite": false,
     "module": "esNext",
     "target": "esNext",

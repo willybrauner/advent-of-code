@@ -9,10 +9,16 @@ export const fileInputs: string[] = fs
 
 /**
  * Convert to columns
+ * and deduce witch bit is the winner 
  * [
-        [ 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0 ],
-        [ 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1 ]
+        [ 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0 ], -> 1
+        [ 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1 ] -> 0
         ...
+   ]
+
+ * return array of bit winner  
+ * [1, 0, ...]
+
  O n^2
  * @param inputs 
  */

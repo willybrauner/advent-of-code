@@ -1,5 +1,6 @@
-import { fileInputs, PLAY_NUMBERS } from "../day-04"
+import formatInputs from "./formatInputs"
 
-it('should return input file', ()=> {
-    console.log(PLAY_NUMBERS)
-})
+const [PLAY_NUMBERS, GRIDS] = formatInputs("inputs-example.txt")
+console.log("PLAY_NUMBERS, GRIDS", PLAY_NUMBERS, GRIDS)
+
+it("should return input file", () => {})

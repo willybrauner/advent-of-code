@@ -87,89 +87,50 @@ const markValue = (value: string) => (value.endsWith("**") ? value : `${value}**
  * @return {boolean} return true if one column or one row of the grid is complete
  * (all numbers of this column or this row is marked)
  */
+
+type TOneGridResult = { grid: TGrid; lastCalledPlayValue: string }
+
+// prettier-ignore
 export const parseOneGrid = (grid: TGrid, playValues: TPlayValues): boolean => {
   let lastCalledPlayValue: string = null
-  let newGrid: TGrid
 
-  // for each play value
-  for (const playValue of playValues) {
+  // for each play value ...
+  const oneGridResult = playValues?.reduce<TOneGridResult>(
+    (prevResult: TOneGridResult, playValue: string): TOneGridResult => 
+    {
+      // map on rows, return markedGrid
+      const markedGrid = prevResult.grid.reduce<TGrid>(
+        (accGrid: TGrid, currRow: TRow): TGrid => 
+        {
+          // map on values, return markedRow
+          const markedRow = currRow.reduce<TRow>(
+            (accValue: TRow, currValue: string): TRow => 
+            [
+              ...accValue,
+              playValue === currValue ? markValue(currValue) : currValue,
+            ],
+            []
+          )
+          return [...accGrid, markedRow]
+        },
+        []
+      )
 
-    const tempGrid = (newGrid || grid).reduce<TGrid>(
-      (accGrid: TGrid, currRow: TRow): TGrid => {
+      const rowWin = gridHasWinnerRow(markedGrid)
+      const columnWin = gridHasWinnerRow(convertColumnsToRows(markedGrid))
+      if ((rowWin || columnWin) && !lastCalledPlayValue) 
+      {
+          lastCalledPlayValue = playValue
+          console.log("win", { columnWin, rowWin, grid: markedGrid, lastCalledPlayValue })
+      }
        
-        // map on row values
-        const markedRow = currRow.reduce<TRow>(
-          (accValue: TRow, currValue: string): TRow => {
-            // check if current value is played
-            const valueIsPlayed = playValue === currValue
+       return { grid: markedGrid, lastCalledPlayValue }
+      
+    },
+    { grid, lastCalledPlayValue }
+  )
 
-            if (valueIsPlayed) {
-              const rowWin = gridHasWinnerRow(accGrid)
-              console.log("rowWin", {rowWin, currValue, accGrid})
-
-              const columnWin = gridHasWinnerRow(convertColumnsToRows(accGrid))
-              console.log("columnWin", columnWin, currValue)
-
-              if (rowWin || columnWin) {
-                console.log("row or column win", { currValue, playValue })
-                lastCalledPlayValue = currValue
-              }
-            }
-
-            return [...accValue, valueIsPlayed ? markValue(currValue) : currValue]
-          },
-           []
-        )
-        //console.log("markedRow",markedRow)
-        return [...(accGrid), markedRow]
-      },
-      []
-    )
-    console.log("tempGrid", tempGrid)
-    if (lastCalledPlayValue == null) {
-      newGrid = tempGrid
-    }
-  }
-
-  console.log("lastCalledPlayValue", lastCalledPlayValue)
-  console.log("newGrid", newGrid)
-
-  //   const markedGrid = grid.reduce<TGrid>((accGrid: TGrid, currRow: TRow): TGrid => {
-  //     // marked each value of of current row
-  //     const markedRow = currRow.reduce<TRow>((accValue: TRow, currValue: string): TRow => {
-  //       // check if current value is played
-  //       const valueIsPlayed = playValues.some((el) => el === currValue)
-
-  //       // prepare markvalue
-  //       const markValue = (value: string) => (value.endsWith("**") ? value : `${value}**`)
-  //       const newGrid = [...accValue, valueIsPlayed ? markValue(currValue) : currValue]
-
-  //       // if value is played and row or column win, register the winner value
-  //       if (valueIsPlayed) {
-  //         const rowWin = gridHasWinnerRow(accGrid)
-  //         console.log("rowWin", rowWin, currValue)
-
-  //         const columnWin = gridHasWinnerRow(convertColumnsToRows(accGrid))
-  //         console.log("columnWin", columnWin, currValue)
-
-  //         if (rowWin || columnWin) {
-  //           console.log("row or column win")
-  //           lastCalledPlayValue = currValue
-  //           return newGrid
-  //         }
-  //       }
-
-  //       return newGrid
-  //     }, [])
-
-  //     return [...accGrid, markedRow]
-  //   }, [])
-
-  // parse Row and Columns
-  //   const rowWin = gridHasWinnerRow(markedGrid)
-  //   const columnWin = gridHasWinnerRow(convertColumnsToRows(markedGrid))
-  //   console.log("rowWin", rowWin)
-  //   console.log("columnWin", columnWin)
+  console.log("resultGrid", oneGridResult)
 
   return
 }

@@ -1,9 +1,9 @@
 const fs = require("fs")
 const path = require("path")
 
-export type TPlayNumbers = [string, string, string, string, string]
-export type TRow = [string, string, string, string, string]
-export type TGrid = [TRow, TRow, TRow, TRow, TRow]
+export type TPlayValues = string[]
+export type TRow = string[]
+export type TGrid = TRow[]
 
 export default (filename: string = "inputs.txt"): [string[], TGrid[]] => {
   const fileInputs: string[] = fs

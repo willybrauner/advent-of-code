@@ -1,4 +1,4 @@
-import formatInputs, { TGrid, TRow } from "./formatInputs"
+import formatInputs, { TGrid, TPlayValues, TRow } from "./formatInputs"
 
 const [PLAY_NUMBERS, GRIDS] = formatInputs("inputs.txt")
 
@@ -12,7 +12,27 @@ const [PLAY_NUMBERS, GRIDS] = formatInputs("inputs.txt")
 
 // -------------------------------------------------------------------------- LOCAL
 
-const markValue = (value: string) => (value.endsWith("**") ? value : `${value}**`)
+/**
+ * Parse each values and check if is matching with one playValue.
+ * If match, return "value*" marked with '*' at the end
+ * @param grid
+ * @param playValues
+ * @returns
+ */
+export const markValuesOfOneGrid = (grid: TGrid, playValues: TPlayValues): TGrid => {
+  return grid.reduce<TGrid>((accGrid: TGrid, currRow: TRow): TGrid => {
+    // marked each value of of current row
+    const markedRow = currRow.reduce<TRow>((accValue: TRow, currValue: string): TRow => {
+      // check if current value is played
+      const valueIsPlayed = playValues.some((el) => el === currValue)
+      // prepare markvalue
+      const markValue = (value: string) => (value.endsWith("**") ? value : `${value}**`)
+
+      return [...accValue, valueIsPlayed ? markValue(currValue) : currValue]
+    }, [])
+    return [...accGrid, markedRow]
+  }, [])
+}
 
 // -------------------------------------------------------------------------- FINAL
 /**
@@ -26,18 +46,10 @@ const markValue = (value: string) => (value.endsWith("**") ? value : `${value}**
  * @return {boolean} return true if one column or one row of the grid is complete
  * (all numbers of this column or this row is marked)
  */
-export const parseOnGrid = (
-  grid: TGrid,
-  playValues: [string, string, string, string, string]
-): boolean => {
+export const parseOnGrid = (grid: TGrid, playValues: TPlayValues): boolean => {
   // Mark
-  const markedGrid = grid.reduce((accRow: TRow, currRow: TRow, i) => {
-    const markedRow = currRow.reduce((accValue, currValue, i) => {
-      const valueIsPlayed = playValues.some((el) => el === currValue)
-      return [...(accValue || []), valueIsPlayed ? markValue(currValue) : currValue]
-    }, [])
-    return [...accRow, markedRow]
-  }, [])
+  const markedGrid = markValuesOfOneGrid(grid, playValues)
+  // parse Row and Columns
 
   console.log(markedGrid)
 

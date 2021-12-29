@@ -13,44 +13,6 @@ const [PLAY_NUMBERS, GRIDS] = formatInputs("inputs.txt")
 
 // -------------------------------------------------------------------------- LOCAL
 
-// /**
-//  * Parse each values and check if is matching with one playValue.
-//  * If match, return "value*" marked with '*' at the end
-//  * @param grid
-//  * @param playValues
-//  */
-// export type TMarkValues = { grid: TGrid; lastCalledValue: number }
-// export const markValuesOfOneGrid = (
-//   grid: TGrid,
-//   playValues: TPlayValues
-// ): TMarkValues => {
-//   let justCalledValue = null
-
-//   const newGrid = grid.reduce<TGrid>((accGrid: TGrid, currRow: TRow): TGrid => {
-//     // marked each value of of current row
-//     const markedRow = currRow.reduce<TRow>((accValue: TRow, currValue: string): TRow => {
-//       // check if current value is played
-//       const valueIsPlayed = playValues.some((el) => el === currValue)
-
-//       if (valueIsPlayed) {
-//         const rowWin = gridHasWinnerRow(accGrid)
-//         const columnWin = gridHasWinnerRow(convertColumnsToRows(accGrid))
-//         console.log("rowWin", rowWin, currValue)
-//         console.log("columnWin", columnWin, currValue)
-//         if (rowWin || columnWin) justCalledValue = currValue
-//       }
-
-//       // prepare markvalue
-//       const markValue = (value: string) => (value.endsWith("**") ? value : `${value}**`)
-//       return [...accValue, valueIsPlayed ? markValue(currValue) : currValue]
-//     }, [])
-
-//     return [...accGrid, markedRow]
-//   }, [])
-
-//   return { grid: newGrid, lastCalledValue: justCalledValue }
-// }
-
 /**
  * Return true if each value of a row is marked
  * @param grid
@@ -72,6 +34,17 @@ export const convertColumnsToRows = (grid: TGrid): TGrid => {
   return valuesArray
 }
 
+/**
+ *
+ * @param value
+ * @returns
+ */
+export const getSumOfUnmarkedValueOfGrid = (grid: TGrid): number => {
+  const flat = grid.flat().map(el => parseInt(el))
+  console.log(flat)
+  return 
+}
+
 // prepare markvalue
 const markValue = (value: string) => (value.endsWith("**") ? value : `${value}**`)
 
@@ -84,18 +57,18 @@ const markValue = (value: string) => (value.endsWith("**") ? value : `${value}**
  *
  * @param grid grid to mark & check
  * @param playValues 5 numbers played on one tour
- * @return {boolean} return true if one column or one row of the grid is complete
- * (all numbers of this column or this row is marked)
+ * @return {TOneGridResult} return {grid, lastCalledPlayValue}
+ * If lastCalledPlayValue is null, no row or column match on this grid
  */
 
 type TOneGridResult = { grid: TGrid; lastCalledPlayValue: string }
 
 // prettier-ignore
-export const parseOneGrid = (grid: TGrid, playValues: TPlayValues): boolean => {
+export const parseOneGrid = (grid: TGrid, playValues: TPlayValues): TOneGridResult => {
   let lastCalledPlayValue: string = null
 
   // for each play value ...
-  const oneGridResult = playValues?.reduce<TOneGridResult>(
+  const oneGridResult: TOneGridResult = playValues?.reduce<TOneGridResult>(
     (prevResult: TOneGridResult, playValue: string): TOneGridResult => 
     {
       // map on rows, return markedGrid
@@ -123,16 +96,14 @@ export const parseOneGrid = (grid: TGrid, playValues: TPlayValues): boolean => {
           lastCalledPlayValue = playValue
           console.log("win", { columnWin, rowWin, grid: markedGrid, lastCalledPlayValue })
       }
-       
        return { grid: markedGrid, lastCalledPlayValue }
       
     },
     { grid, lastCalledPlayValue }
   )
-
   console.log("resultGrid", oneGridResult)
 
-  return
+  return oneGridResult
 }
 
 /**

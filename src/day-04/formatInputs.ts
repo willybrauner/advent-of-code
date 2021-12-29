@@ -1,10 +1,10 @@
 const fs = require("fs")
 const path = require("path")
 
-type TRow = [number, number, number, number, number]
+type TRow = [string, string, string, string, string]
 type TGrid = [TRow, TRow, TRow, TRow, TRow]
 
-export default (filename: string = "inputs.txt"): [number[], TGrid[]] => {
+export default (filename: string = "inputs.txt"): [string[], TGrid[]] => {
   const fileInputs: string[] = fs
     .readFileSync(path.resolve(__dirname, filename), "utf8")
     .split("\n\n")
@@ -13,41 +13,27 @@ export default (filename: string = "inputs.txt"): [number[], TGrid[]] => {
   /**
    * PLAY NUMBERS
    */
-  const PLAY_NUMBERS: number[] = fileInputs
-    .shift()
-    .split(",")
-    .map((el) => parseInt(el))
+  const PLAY_NUMBERS: string[] = fileInputs.shift().split(",")
 
   /**
  * GRID 
+ * Keep strings instead of convert them to numbers, is easier to marking values 
+ * ex: '14*'
  * [
-      [
-        [ 86, 46, 47, 61, 57 ],
-        [ 44, 74, 17, 5, 87 ],
-        [ 78, 8, 54, 55, 97 ],
-        [ 11, 90, 7, 75, 70 ],
-        [ 81, 50, 84, 10, 60 ]
-      ],
-      [
-        [ 86, 46, 47, 61, 57 ],
-        [ 44, 74, 17, 5, 87 ],
-        [ 78, 8, 54, 55, 97 ],
-        [ 11, 90, 7, 75, 70 ],
-        [ 81, 50, 84, 10, 60 ]
-      ],
-      ...
-      
+       [
+          [ '22', '13', '17', '11', '0' ],
+          [ '8', '2', '23', '4', '24' ],
+          [ '21', '9', '14', '16', '7' ],
+          [ '6', '10', '3', '18', '5' ],
+          [ '1', '12', '20', '15', '19' ]
+        ],
+        ...
      ]
    ]
  */
 
   const GRIDS = fileInputs.map((el) =>
-    el.split("\n").map((el) =>
-      el
-        .split(" ")
-        .filter((el) => el !== "")
-        .map((el) => parseInt(el))
-    )
+    el.split("\n").map((el) => el.split(" ").filter((el) => el !== ""))
   ) as TGrid[]
 
   return [PLAY_NUMBERS, GRIDS]

@@ -1,4 +1,3 @@
-import { json } from "stream/consumers"
 import formatInputs, { TGrid, TPlayValues, TRow } from "./formatInputs"
 
 const [PLAY_NUMBERS, GRIDS] = formatInputs("inputs.txt")
@@ -35,20 +34,26 @@ export const convertColumnsToRows = (grid: TGrid): TGrid => {
 }
 
 /**
- *
+ * Get sum value of remains number (unmarked) of a grid
+ * @param value
+ */
+export const getSumOfUnmarkedValueOfGrid = (grid: TGrid): number => {
+  return grid
+    .flat()
+    ?.filter((el) => !el.endsWith("**"))
+    ?.map((el) => parseInt(el))
+    .reduce((acc, curr) => acc + curr, 0)
+}
+
+/**
+ * prepare markvalue with **
  * @param value
  * @returns
  */
-export const getSumOfUnmarkedValueOfGrid = (grid: TGrid): number => {
-  const flat = grid.flat().map(el => parseInt(el))
-  console.log(flat)
-  return 
-}
-
-// prepare markvalue
 const markValue = (value: string) => (value.endsWith("**") ? value : `${value}**`)
 
 // -------------------------------------------------------------------------- FINAL
+
 /**
  * Parse one grid
  * - Add mark on each matching playValues of the grid
@@ -57,59 +62,88 @@ const markValue = (value: string) => (value.endsWith("**") ? value : `${value}**
  *
  * @param grid grid to mark & check
  * @param playValues 5 numbers played on one tour
- * @return {TOneGridResult} return {grid, lastCalledPlayValue}
- * If lastCalledPlayValue is null, no row or column match on this grid
+ * @return {TGrid} return marked grid
  */
 
-type TOneGridResult = { grid: TGrid; lastCalledPlayValue: string }
+export const parseOneGrid = (grid: TGrid, playValue: string): TGrid => {
+  // map on rows, return markedGrid
+  const markedGrid = grid.reduce<TGrid>((accGrid: TGrid, currRow: TRow): TGrid => {
+    // map on values, return markedRow
+    const markedRow = currRow.reduce<TRow>(
+      (accValue: TRow, currValue: string): TRow => [
+        ...accValue,
+        playValue === currValue ? markValue(currValue) : currValue,
+      ],
+      []
+    )
+    return [...accGrid, markedRow]
+  }, [])
 
-// prettier-ignore
-export const parseOneGrid = (grid: TGrid, playValues: TPlayValues): TOneGridResult => {
-  let lastCalledPlayValue: string = null
-
-  // for each play value ...
-  const oneGridResult: TOneGridResult = playValues?.reduce<TOneGridResult>(
-    (prevResult: TOneGridResult, playValue: string): TOneGridResult => 
-    {
-      // map on rows, return markedGrid
-      const markedGrid = prevResult.grid.reduce<TGrid>(
-        (accGrid: TGrid, currRow: TRow): TGrid => 
-        {
-          // map on values, return markedRow
-          const markedRow = currRow.reduce<TRow>(
-            (accValue: TRow, currValue: string): TRow => 
-            [
-              ...accValue,
-              playValue === currValue ? markValue(currValue) : currValue,
-            ],
-            []
-          )
-          return [...accGrid, markedRow]
-        },
-        []
-      )
-
-      const rowWin = gridHasWinnerRow(markedGrid)
-      const columnWin = gridHasWinnerRow(convertColumnsToRows(markedGrid))
-      if ((rowWin || columnWin) && !lastCalledPlayValue) 
-      {
-          lastCalledPlayValue = playValue
-          console.log("win", { columnWin, rowWin, grid: markedGrid, lastCalledPlayValue })
-      }
-       return { grid: markedGrid, lastCalledPlayValue }
-      
-    },
-    { grid, lastCalledPlayValue }
-  )
-  console.log("resultGrid", oneGridResult)
-
-  return oneGridResult
+  return markedGrid
 }
 
 /**
+ * Parse all grids
  *
+ * Returns
  * @returns
  */
-export const parseAllGrids = (): boolean => {
-  return
+type TGridsResult = {
+  markedGrids: TGrid[]
+  winnerGrid: TGrid
+  lastCalledPlayValue: string
+}
+export const parseAllGrids = (grids = GRIDS, playValues: TPlayValues = PLAY_NUMBERS) => {
+  let lastCalledPlayValue = null
+  let winnerGrid = null
+
+  /**
+   * Map on playValues
+   *    Map on grids
+   *       for each grid and check if row or column win
+   */
+  const result = playValues?.reduce<TGridsResult>(
+    (prevResult: TGridsResult, playValue: string): TGridsResult => {
+      // if already flag, don't continue
+      if (lastCalledPlayValue) {
+        return {
+          markedGrids: prevResult.markedGrids,
+          winnerGrid: prevResult.winnerGrid,
+          lastCalledPlayValue,
+        }
+      }
+
+      const markedGrids: TGrid[] = []
+      for (let i = 0; i < prevResult.markedGrids.length; i++) {
+        const grid = prevResult.markedGrids[i]
+        const parsedGrid = parseOneGrid(grid, playValue)
+
+        if (
+          (gridHasWinnerRow(parsedGrid) ||
+            gridHasWinnerRow(convertColumnsToRows(parsedGrid))) &&
+          !lastCalledPlayValue
+        ) {
+          lastCalledPlayValue = playValue
+          winnerGrid = parsedGrid
+          break
+        } else {
+          markedGrids[i] = parsedGrid
+        }
+      }
+
+      return {
+        winnerGrid,
+        lastCalledPlayValue,
+        markedGrids,
+      }
+    },
+    { markedGrids: grids, lastCalledPlayValue, winnerGrid }
+  )
+
+  // prettier-ignore
+  return (
+    parseInt(result.lastCalledPlayValue) 
+    * 
+    getSumOfUnmarkedValueOfGrid(result.winnerGrid)
+  )
 }

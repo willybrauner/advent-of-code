@@ -1,7 +1,10 @@
-import { gridHasWinnerRow, convertColumnsToRows, parseOneGrid } from "."
+import {
+  gridHasWinnerRow,
+  convertColumnsToRows,
+  getSumOfUnmarkedValueOfGrid,
+  parseAllGrids,
+} from "."
 import formatInputs from "./formatInputs"
-
-const [PLAY_NUMBERS, GRIDS] = formatInputs("inputs-example.txt")
 
 it("gridHasWinnerRow should return true if all value are ended with **", () => {
   expect(
@@ -33,14 +36,17 @@ it("should convertColumnsToRows", () => {
   ])
 })
 
-it("should parseOneGrid, ", () => {
-  const array = [
-    ["22", "13**", "17**", "11**", "0"],
-    ["8", "2", "23", "4", "24"],
-    ["21**", "9**", "14**", "16", "7"],
-    ["6", "10", "3", "18", "5"],
-    ["1", "12", "20", "15", "19"],
-  ]
+it("should return sum of unmarked", () => {
+  expect(
+    getSumOfUnmarkedValueOfGrid([
+      ["22", "13**", "17**", "11**", "0"],
+      ["8", "2", "23", "4", "24"],
+    ])
+  ).toEqual(83)
+})
 
-  console.log(parseOneGrid(array, ["1", "22", "0", "54", "11"]))
+it("example should return 4512", () => {
+  const [PLAY_NUMBERS, GRIDS] = formatInputs("inputs-example.txt")
+  const all = parseAllGrids(GRIDS, PLAY_NUMBERS)
+  expect(all).toEqual(4512)
 })

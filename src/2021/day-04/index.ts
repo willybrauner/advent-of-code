@@ -52,8 +52,6 @@ export const getSumOfUnmarkedValueOfGrid = (grid: TGrid): number => {
  */
 const markValue = (value: string) => (value.endsWith("**") ? value : `${value}**`)
 
-// -------------------------------------------------------------------------- FINAL
-
 /**
  * Parse one grid
  * - Add mark on each matching playValues of the grid
@@ -82,6 +80,8 @@ export const parseOneGrid = (grid: TGrid, playValue: string): TGrid => {
   return markedGrid
 }
 
+// -------------------------------------------------------------------------- PART 1
+
 /**
  * Parse all grids
  */
@@ -90,15 +90,13 @@ type TGridsResult = {
   winnerGrid: TGrid
   lastCalledPlayValue: string
 }
-export const parseAllGrids = (grids = GRIDS, playValues: TPlayValues = PLAY_NUMBERS) => {
+export const parseAllGridsAndCalc = (
+  grids = GRIDS,
+  playValues: TPlayValues = PLAY_NUMBERS
+) => {
   let lastCalledPlayValue = null
   let winnerGrid = null
 
-  /**
-   * - Map on playValues
-   *    - Map on grids
-   *       - for each grid and check if row or column win
-   */
   const result = playValues?.reduce<TGridsResult>(
     (prevResult: TGridsResult, playValue: string): TGridsResult => {
       // if already flag, don't continue
@@ -137,10 +135,53 @@ export const parseAllGrids = (grids = GRIDS, playValues: TPlayValues = PLAY_NUMB
     { markedGrids: grids, lastCalledPlayValue, winnerGrid }
   )
 
-  // prettier-ignore
   return (
-    parseInt(result.lastCalledPlayValue) 
-    * 
-    getSumOfUnmarkedValueOfGrid(result.winnerGrid)
+    parseInt(result.lastCalledPlayValue) * getSumOfUnmarkedValueOfGrid(result.winnerGrid)
+  )
+}
+
+// -------------------------------------------------------------------------- PART 2
+
+export const getLastWinnerGridAndCalc = (grids = GRIDS, playValues = PLAY_NUMBERS) => {
+  let lastCalledPlayValue = null
+  let winnerGrid = null
+  let winnerGrids = new Array(grids.length).fill(null)
+
+  const result = playValues.reduce<TGridsResult>(
+    (prevResult: TGridsResult, playValue: string): TGridsResult => {
+      const markedGrids: TGrid[] = []
+      for (let i = 0; i < prevResult?.markedGrids.length; i++) {
+        const grid = prevResult.markedGrids[i]
+        if (!grid) return
+        
+        const parsedGrid = parseOneGrid(grid, playValue)
+        markedGrids[i] = parsedGrid
+
+        if (
+          gridHasWinnerRow(parsedGrid) ||
+          gridHasWinnerRow(convertColumnsToRows(parsedGrid))
+        ) {
+          lastCalledPlayValue = playValue
+          winnerGrid = parsedGrid
+          winnerGrids[i] = true
+
+          // all boards/grids win, stop here
+          if (winnerGrids.every((el) => el === true)) {
+            return
+          }
+        }
+      }
+
+      return {
+        winnerGrid,
+        lastCalledPlayValue,
+        markedGrids,
+      }
+    },
+    { markedGrids: grids, lastCalledPlayValue, winnerGrid }
+  )
+
+  return (
+    parseInt(result.lastCalledPlayValue) * getSumOfUnmarkedValueOfGrid(result.winnerGrid)
   )
 }

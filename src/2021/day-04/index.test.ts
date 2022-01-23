@@ -2,7 +2,8 @@ import {
   gridHasWinnerRow,
   convertColumnsToRows,
   getSumOfUnmarkedValueOfGrid,
-  parseAllGrids,
+  parseAllGridsAndCalc,
+  getLastWinnerGridAndCalc,
 } from "."
 import formatInputs from "./formatInputs"
 
@@ -47,6 +48,14 @@ it("should return sum of unmarked", () => {
 
 it("example should return 4512", () => {
   const [PLAY_NUMBERS, GRIDS] = formatInputs("inputs-example.txt")
-  const all = parseAllGrids(GRIDS, PLAY_NUMBERS)
+  const all = parseAllGridsAndCalc(GRIDS, PLAY_NUMBERS)
   expect(all).toEqual(4512)
+})
+
+// --------------------------------------------------- PART 2
+
+it("PART 2", () => {
+  const [PLAY_NUMBERS, GRIDS] = formatInputs("inputs.txt")
+  const all = getLastWinnerGridAndCalc(GRIDS, PLAY_NUMBERS)
+  expect(all).toEqual(4624)
 })

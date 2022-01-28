@@ -8,8 +8,7 @@ it("", () => {
 
 it("", () => {
   const inputs = formatInputs("inputs-example.txt")
-  
   const part2Result = part2(inputs)
-  console.log(part2Result)
-  
+  expect(part2Result).toBe(12)
+
 })

@@ -1,4 +1,7 @@
-// https://adventofcode.com/2021/day/5
+import { TLine } from "."
+
+const fs = require("fs")
+const path = require("path")
 
 /**
  * convert input lines
@@ -12,26 +15,13 @@
  * ]
  */
 
-const fs = require("fs")
-const path = require("path")
-
-export type TVent = { x: number; y: number }
-export type TLine = [TVent, TVent]
-
-export default (filename: string = "inputs-example.txt"): TLine[] => {
-  const inputs = fs
+export default (filename: string = "inputs.txt"): TLine[] =>
+  fs
     .readFileSync(path.resolve(__dirname, filename), "utf8")
     .split("\n")
     .map((el) =>
-      el
-        .split(" -> ")
-        //   .map(el => el.split(',').map(el => parseInt(el)))
-        .map((el) => ({
-          x: parseInt(el.split(",")[0]),
-          y: parseInt(el.split(",")[1]),
-        }))
+      el.split(" -> ").map((el) => ({
+        x: parseInt(el.split(",")[0]),
+        y: parseInt(el.split(",")[1]),
+      }))
     )
-
-  // console.log("inputs", inputs)
-  return inputs
-}

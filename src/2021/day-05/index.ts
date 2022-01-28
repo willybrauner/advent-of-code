@@ -9,7 +9,7 @@ export type TLine = [TCoor, TCoor]
 /**
  * select only matching x1 and x2 or y1 and y2
  */
-export const getInputs = (file = "inputs.txt") =>
+export const getHorizontalAndVerticalInputs = (file = "inputs.txt") =>
   formatInputs(file).filter(
     (input) => (input[0].x === input[1].x || input[0].y === input[1].y) && input
   )
@@ -39,7 +39,7 @@ const getBiggestInputValues = (inputs: TLine[]): TCoor =>
     [
       [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
       [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-      // ...
+      ...
     ]
  */
 const buildDiagram = (biggestValues: TCoor): TDiagram =>
@@ -58,15 +58,29 @@ const markCoveredPoints = (diagram: TDiagram, inputs: TLine[]): TDiagram => {
     if (moveHorizontally) {
       const [from, to] = [line[0].x, line[1].x].sort((a, b) => a - b)
       for (let i = from; i <= to; i++) {
-        diagram[line[0].y][i] = diagram[line[0].y][i] + 1
+        diagram[line[0].y][i] += 1
       }
     } else {
       const [from, to] = [line[0].y, line[1].y].sort((a, b) => a - b)
       for (let i = from; i <= to; i++) {
-        diagram[i][line[0].x] = diagram[i][line[0].x] + 1
+        diagram[i][line[0].x] += 1
       }
     }
   }
+  return diagram
+}
+
+/**
+ * mark covered points horizontal, vertical & diagonal
+ */
+const markCoveredPoints2 = (diagram: TDiagram, inputs: TLine[]): TDiagram => {
+  // TODO make diagonal
+  //
+  //
+  //
+  //
+  //
+  //
   return diagram
 }
 
@@ -82,9 +96,19 @@ const countOverlapLines = (markedDiagram: TDiagram): number =>
 /**
  * part 1
  */
-export const part1 = (inputs = getInputs("inputs.txt")) => {
+export const part1 = (inputs = getHorizontalAndVerticalInputs("inputs.txt")): number => {
   const biggestValues = getBiggestInputValues(inputs)
   const diagram = buildDiagram(biggestValues)
   const markedDiagram = markCoveredPoints(diagram, inputs)
+  return countOverlapLines(markedDiagram)
+}
+
+/**
+ * part 2
+ */
+export const part2 = (inputs = formatInputs("inputs.txt")): number => {
+  const biggestValues = getBiggestInputValues(inputs)
+  const diagram = buildDiagram(biggestValues)
+  const markedDiagram = markCoveredPoints2(diagram, inputs)
   return countOverlapLines(markedDiagram)
 }

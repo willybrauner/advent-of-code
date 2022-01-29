@@ -1,7 +1,7 @@
 // https://adventofcode.com/2021/day/6
-import formatInputs from "./formatInputs"
 
-export const part1 = (inputs: number[], days = 80) => {
+export const part1 = (inputs: number[], days = 80) => 
+{
   
   const ipt = [...inputs]
 
@@ -19,11 +19,9 @@ export const part1 = (inputs: number[], days = 80) => {
             {
                 ipt[i] -= 1;
             }
-
         }
         
   }
     return ipt
-
 
 }

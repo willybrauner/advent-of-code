@@ -21,3 +21,17 @@ it("", ()=> {
   expect(p1.length).toBe(362346)
 
 })
+
+it("", ()=> {
+
+//   const inputs = formatInputs("inputs-example.txt")
+//   const p1_256 = part1(inputs, 256)
+//   console.log('p1_256',p1_256)
+
+  // 18  -> 26
+  // 80  -> 5934
+  // 256 -> 26984457539
+
+  //expect(p1_256.length).toBe(362346)
+
+})

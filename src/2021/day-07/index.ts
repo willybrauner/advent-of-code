@@ -19,3 +19,8 @@ export const part1 = (inputs: number[]) =>
     return fuel
 
 }
+
+export const part2 = (inputs: number[]) =>
+{
+    
+}

@@ -13,9 +13,8 @@ const path = require("path")
 
 */
 
-export type TInputs = number[][][]
 
-export default (filename: string = "inputs.txt"):TInputs =>
+export default (filename: string = "inputs.txt") =>
   fs.readFileSync(path.resolve(__dirname, filename), "utf8")
   .split("\n")
   .map(el  => 

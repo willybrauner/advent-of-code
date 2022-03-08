@@ -9,6 +9,5 @@ it("Part 1 example", () => {
 
 it("Part 2 example", () => {
   const inputs = formatInputs("inputs-example.txt")
-  console.log(part2(inputs))
-   
+  expect(part2(inputs)).toBe(61229)   
 })

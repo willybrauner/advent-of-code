@@ -7,10 +7,10 @@ type TCara = TOpen & TClose
 const COUPLES = [["(", ")"],["[", "]"],["{", "}"],["<", ">"]]
 
 // utils
-const isOpen = (cara:TCara) => 
+const isOpen = (cara:TCara) =>
   COUPLES.some(c => c[0] === cara)
 
-const isMatching = (open, close) => 
+const isMatching = (open, close) =>
   COUPLES.some((couple) => couple[0] === open && couple[1] === close)
 
 const getCloseByOpen = (open:TOpen): TClose =>
@@ -18,13 +18,13 @@ const getCloseByOpen = (open:TOpen): TClose =>
 
 /**
  * Part 1
- */  
+ */
 export const part1 = (inputs: TCara[][]) => {
   const illegals = []
-  for (let line of inputs) 
+  for (let line of inputs)
   {
     const stack = []
-    for (let cara of line) 
+    for (let cara of line)
     {
       // is open, push on first position of stack
       if(isOpen(cara)) stack.unshift(cara)
@@ -40,10 +40,10 @@ export const part1 = (inputs: TCara[][]) => {
       }
     }
   }
- 
+
   // return obj  { '}': 2, '>': 2, ')': 3, ']': 1 }
   const objCount = illegals.reduce((a,b)=> ({...a, [b]: a[b] ? a[b]+1 : 1 }), {})
-  
+
   return Object.keys(objCount).reduce((a, b) => {
      if(b === ")") return a + (3 * objCount[b])
      if(b === "]") return a + (57 * objCount[b])
@@ -56,15 +56,15 @@ export const part1 = (inputs: TCara[][]) => {
 
 /**
  * Part 2
- */  
+ */
 export const part2 = (inputs: TCara[][]) => {
 
   const rests = []
-  for (let i = 0; i < inputs.length; i++) 
+  for (let i = 0; i < inputs.length; i++)
   {
     const stack = []
     const line = inputs[i]
-    for (let l = 0; l < line.length; l++) 
+    for (let l = 0; l < line.length; l++)
     {
       const cara = line[l]
       // is open, push in 1st position in stack
@@ -91,7 +91,7 @@ export const part2 = (inputs: TCara[][]) => {
   // final calc de la mort
   const totals = missings
   .reduce((acc, curr) => [
-    ...acc, 
+    ...acc,
     curr.reduce((a, b) => {
       if (b === ']') return (a * 5) + 2;
       if (b === ')') return (a * 5) + 1;
@@ -100,7 +100,7 @@ export const part2 = (inputs: TCara[][]) => {
     }, 0)
   ] , [])
   .sort((a, b) => a - b)
-    
+
   return totals[Math.floor(totals.length / 2)]
 
 }

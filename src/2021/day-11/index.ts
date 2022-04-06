@@ -5,8 +5,9 @@ const { log } = console
 let flashes = 0;
 let stepFlashCoords = [];
 
-const _runStep = (inputs) => 
-{
+const _runStep = (inputs) => {
+
+  // parse matrix
   for (let y = 0; y < inputs.length; y++) 
   {
     for (let x = 0; x < inputs[y].length; x++) 
@@ -57,7 +58,6 @@ const _runStep = (inputs) =>
 
 
 export const part1 = (inputs: number[][]) => {
-
     //  start !
   for (let i = 0 ; i < 100; i++)
   {
@@ -81,13 +81,11 @@ export const part1 = (inputs: number[][]) => {
  */
 export const part2 = (inputs: number[][]) => 
 {
+  let fullFlashMotherFuckingStepNumber = 0
 
-  let fullFlashingMotherFunkingStepNumber = 0
   while(true)
   {
-
-    fullFlashingMotherFunkingStepNumber++
-
+    fullFlashMotherFuckingStepNumber++
     // re init array
     stepFlashCoords = []
     // increment each 
@@ -95,14 +93,9 @@ export const part2 = (inputs: number[][]) =>
     // ruuuuun
    _runStep(inputs)
 
-    
-
-    if (inputs.every(e => e.every(e => e === 0)))
-    {
-      break
-    }
+    if (inputs.every(e => e.every(e => e === 0))) break
   }
 
-  return fullFlashingMotherFunkingStepNumber
+  return fullFlashMotherFuckingStepNumber
 
 }

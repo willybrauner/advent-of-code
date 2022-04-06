@@ -1,51 +1,91 @@
 // https://adventofcode.com/2021/day/11
-const {log} = console
+const { log } = console
 
 export const part1 = (inputs: number[][]) => {
+  let lights = 0
 
-  let adjacent = (y, x) => ({
-    [`${y}/${x - 1}`]: inputs[y]?.[x - 1],           // center prev
-    [`${y}/${x + 1}`]: inputs[y]?.[x + 1],           // center next
-    [`${y - 1}/${x}`]: inputs[y - 1]?.[x],           // top
-    [`${y - 1}/${x - 1}`]: inputs[y - 1]?.[x - 1],   // top prev
-    [`${y - 1}/${x + 1}`]: inputs[y - 1]?.[x + 1],   // top next
-    [`${y + 1}/${x}`]: inputs[y + 1]?.[x],           // bottom
-    [`${y + 1}/${x - 1}`]: inputs[y + 1]?.[x - 1],   // bottom prev
-    [`${y + 1}/${x + 1}`]: inputs[y + 1]?.[x + 1],   // bottom next
-  })
-
-  for (let r = 0; r < 3; r++) {
-    log("inputs", inputs)
-
-    for (let i = 0; i < inputs.length; i++) {
-      for (let p = 0; p < inputs[i].length; p++) {
-
-        inputs[i][p]++
-        if (inputs[i][p] > 9)
-        {
-          inputs[i][p] = 0
-          const increment = (y, x) => {
-            const adj = adjacent(y, x)
-            // log('adj',adj)
-            for (let el of Object.keys(adj)) {
-              if (adj[el]) adj[el]++
-              if (adj[el] > 9) {
-                adj[el] = 0
-                const [y, x] = el.split("/").map(e => parseInt(e))
-                increment(y, x)
-              }
-            }
-          }
-          increment(p, i)
-        }
-
-
+  const runStep = (pY, pX) => {
+    for (let y = -1 + pY; y <= 1 + pY; y++) 
+    {
+      for (let x = -1 + pX; x <= 1 + pX; x++) 
+      { 
+        // log({y,x}, {pY, pX})
+        if (!inputs?.[y]?.[x]) continue
+        
+        if (inputs[y][x] === 10) {
+          inputs[y][x] = 0
+          lights++
+          runStep(y, x)
+        }        
+        
+        inputs[y][x]++
+        
       }
     }
   }
+
+  // start
+  for (let i = 0 ; i < 1; i++)
+  {
+    inputs = inputs.map(e => e.map(e => e+1))
+    runStep(0, 0)
+    log(inputs)
+  }
+
+  // ---------------------------------------------------
+
+  const run = () => 
+  {
+   for (let y = 0; y < inputs.length; y++) 
+    {
+      for (let x = 0; x < inputs[y].length; x++) 
+      {
+
+        if (inputs[y][x] > 9) 
+        {  
+   
+          let adjCoor = [
+            [y-1, x-1],
+            [y-1, x],
+            [y-1, x+1],
+            [y, x-1],
+            [y, x+1],
+            [y+1, x-1],
+            [y+1, x],
+            [y+1, x+1] 
+          ]
+    
+          // increment
+           adjCoor.forEach((e) => {
+            if (!inputs?.[e[0]]?.[e[1]]) return
+            inputs[e[0]][e[1]]++
+          })
+
+          inputs[y][x] = 0
+          log(inputs)
+        }
+      }
+    }
+  }
+
+
+  // start 
+  // for (let i = 0 ; i < 2; i++)
+  // {
+  //   inputs = inputs.map(e => e.map(e => e+1))
+  //   run()
+  //   log('inputs',inputs)
+  // }
+
+  return lights
 }
 
 
-export const part2 = (inputs) => {
 
-}
+
+
+
+
+
+
+export const part2 = (inputs) => {}

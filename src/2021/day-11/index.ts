@@ -2,49 +2,21 @@
 const { log } = console
 
 export const part1 = (inputs: number[][]) => {
-  let lights = 0
 
-  const runStep = (pY, pX) => {
-    for (let y = -1 + pY; y <= 1 + pY; y++) 
-    {
-      for (let x = -1 + pX; x <= 1 + pX; x++) 
-      { 
-        // log({y,x}, {pY, pX})
-        if (!inputs?.[y]?.[x]) continue
-        
-        if (inputs[y][x] === 10) {
-          inputs[y][x] = 0
-          lights++
-          runStep(y, x)
-        }        
-        
-        inputs[y][x]++
-        
-      }
-    }
-  }
+  let flashes = 0;
+  let stepFlashCoords = [];
 
-  // start
-  for (let i = 0 ; i < 1; i++)
+  const runStep = () => 
   {
-    inputs = inputs.map(e => e.map(e => e+1))
-    runStep(0, 0)
-    log(inputs)
-  }
 
-  // ---------------------------------------------------
-
-  const run = () => 
-  {
    for (let y = 0; y < inputs.length; y++) 
     {
       for (let x = 0; x < inputs[y].length; x++) 
       {
-
         if (inputs[y][x] > 9) 
         {  
-   
-          let adjCoor = [
+  
+          const adjCoor = [
             [y-1, x-1],
             [y-1, x],
             [y-1, x+1],
@@ -54,30 +26,51 @@ export const part1 = (inputs: number[][]) => {
             [y+1, x],
             [y+1, x+1] 
           ]
+          
+          // flash!
+          inputs[y][x] = 0
+          
+          // if has aready flashed, next iteration
+          if (stepFlashCoords.some(e=> e.y === y && e.x === x)) continue
+
+          // increment counter
+          flashes++
+          
+          // keep flash coordinates in global
+          stepFlashCoords.push({y,x})
     
-          // increment
+          // increment adjcent
            adjCoor.forEach((e) => {
             if (!inputs?.[e[0]]?.[e[1]]) return
             inputs[e[0]][e[1]]++
           })
 
-          inputs[y][x] = 0
-          log(inputs)
+          // if one of adjacent is gretter than 9, run step recucively
+          adjCoor.forEach((e) => {
+            if (inputs?.[e[0]]?.[e[1]] > 9) {
+              runStep()
+            }
+          })
+        
         }
       }
     }
   }
 
 
-  // start 
-  // for (let i = 0 ; i < 2; i++)
-  // {
-  //   inputs = inputs.map(e => e.map(e => e+1))
-  //   run()
-  //   log('inputs',inputs)
-  // }
+  //  start !!!!!
+  for (let i = 0 ; i < 100; i++)
+  {
+    // re init array
+    stepFlashCoords = []
+    // increment each 
+    inputs = inputs.map(e => e.map(e => e+1))    
+    // ruuuuun
+    runStep()
 
-  return lights
+  }
+  
+  return flashes
 }
 
 

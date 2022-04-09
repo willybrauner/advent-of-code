@@ -3,6 +3,7 @@ import formatInputs from "./inputs-format"
 
 it("Part 1 example", () => {
   const inputs = formatInputs("inputs-example.txt")
+  console.log('inputs', inputs)
   console.log(part1(inputs))
   //expect(part1(inputs)).toBe(...)
 })

@@ -1,57 +1,69 @@
 // https://adventofcode.com/2021/day/12
-const {log} = console
 
+const {log} = console
+const isLowerCase = (input:string) :boolean => input === String(input).toLowerCase()
+  
 export const part1 = (inputs:[string, string][]) =>
  {
+    // arr of path arrays 
+    let paths = []
+
+    // create path function called recursively
+    const createPath = (curr:string[], npts = inputs) :void =>
+    {
+        const last = curr[curr.length - 1];
+        
+        if(last === "end") return
+    
+        const els = npts.filter(arr => arr.includes(last))
+
+        const vals =[]
+        for (let i = 0; i<els.length; i+=1) {
+            const val = els[i].find((e) => (e !== last) && e !== "start")
+            vals.push(val)
+        }
+
+        for(let val of vals) {
+            if (!val || (curr.includes(val) && isLowerCase(val))) continue
+            const n = [...curr, val];
+            paths.push(n)
+
+            // restart with new param ex: ['start', 'b', 'A']
+            // used as starting path
+            createPath(n)
+        } 
+    }
+
+    // start path creation with start as first value
+    createPath(["start"])
 
     /**
-     * filter all pair who contains "start" | "end" | not start & not end
-     * [
-     *   // "starts" array
-     *   [ 
-     *      [ 'start', 'A' ], 
-     *      [ 'start', 'b' ] 
-     *   ],
-     *   // "middles" array
-     *   [ 
-     *      [ 'A', 'b' ], 
-     *      [ 'A', 'c' ], 
-     *      [ 'b', 'd' ] 
-     *   ],
-     *   // "ends" array
-     *   [ 
-     *      [ 'A', 'end' ], 
-     *      [ 'b', 'end' ] 
-     *   ]
-     * ]
-     */
-    const formatted = inputs.reduce((a, b:[string, string]) => 
-    {
-        if (b.includes('start'))    a[0] = [...(a?.[0] || []), b]
-        else if (b.includes('end')) a[2] = [...(a?.[2] || []), b]
-        else                        a[1] = [...(a?.[1] || []), b]
-        return a
-    }
-    , [])
-
-    const [starts, middles, ends] = formatted;
+     * log(paths)
+      at this point, paths, looks likes:
+     [
+      [ 'start', 'A' ],
+      [ 'start', 'A', 'c' ],
+      [ 'start', 'A', 'c', 'A' ],
+      [ 'start', 'A', 'c', 'A', 'b' ],
+      [ 'start', 'A', 'c', 'A', 'b', 'A' ],
+      [ 'start', 'A', 'c', 'A', 'b', 'A', 'end' ],
+      [ 'start', 'A', 'c', 'A', 'b', 'd' ],
+      ...
+    ]
     
+    We need to only keep completed paths witch included "start" and "end"
+    */
+    
+    const filterPaths = paths.filter(el => el[el.length - 1] === "end")    
+    return filterPaths.length;
 
-    // create paths
-    // move on each segments 
-    const path = []
-    for(let start of starts)
-    {
-        for (let middle of middles)
-        {
-            for (let end of ends)
-            {
-                
-            }
-        }
-    }
+}
 
- }
+
+
+
+
+
 
 export const part2 = (inputs) => {
 

@@ -7,14 +7,15 @@ export default (filename: string = "inputs.txt") =>
   .split('\n')
   .filter(el => el !== "")
     .reduce((a ,b) => {
-      if (b.startsWith('fold')) {
-        
-        // TODO formater 
-        // [ 'fold along y=7', 'fold along x=5' ]
-        // en [{y:7}, {x,5}]
-        a[1].push(b)
+      if (b.startsWith('fold')) 
+      {
+        const s = b.split(" ")
+        const last = s[s.length - 1]
+        const coor = last.split("=")
+        a[1].push(coor.map(e => parseInt(e) ? parseInt(e) : e))
       }
-      else {
+      else 
+      {
         a[0].push(b.split(",").map(e => parseInt(e)))
       }
       

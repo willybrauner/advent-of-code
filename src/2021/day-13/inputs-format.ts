@@ -1,8 +1,12 @@
 const fs = require("fs")
 const path = require("path")
 
+export type TCoor = [number, number][]
+export type TFold = [("y" | "x"), number][]
+export type TInputs = [TCoor, TFold]
+
 //export default
-export default (filename: string = "inputs.txt") =>
+export default (filename: string = "inputs.txt"): TInputs =>
   fs.readFileSync(path.resolve(__dirname, filename), "utf8")
   .split('\n')
   .filter(el => el !== "")

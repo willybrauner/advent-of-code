@@ -97,6 +97,7 @@ export const part2 = (inputs: TInputs) => {
                     matrix[fValue - (y - fValue)][x] = "#"
             }
             
+            // fold on X axis
             matrix.splice(fValue)
 
         }
@@ -110,17 +111,16 @@ export const part2 = (inputs: TInputs) => {
                     matrix[y][fValue - (x - fValue)] = "#"
             }
 
+            // fold on Y axis
             matrix.map(y => y.splice(fValue))
         }
 
-
+        // calc new coords after fold
         newCoords = []
         for(let y = 0; y < matrix.length; y++)
             for(let x = 0; x < matrix[y].length; x++)
                 if (matrix[y][x] === "#") newCoords.push([x, y])
-        
-        log(matrix)
-        log(newCoords)
+
     }
 
 

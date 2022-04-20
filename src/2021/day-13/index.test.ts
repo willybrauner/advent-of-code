@@ -9,7 +9,7 @@ it("Part 1 example", () => {
 })
 
 it("Part 2 example", () => {
-  const inputs = formatInputs("inputs-example.txt")
+  const inputs = formatInputs("inputs.txt")
   part2(inputs)
   //expect(part2(inputs)).toBe(...)
 })

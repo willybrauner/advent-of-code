@@ -3,19 +3,18 @@ import { TInputs } from "./inputs-format"
 const {log} = console
 
 
-export const part1 = (inputs: TInputs) =>
- {
-    const [coords, folds] = inputs
-
-     // get biggests X & Y
-     const [bX, bY] = coords.reduce((a, b) => 
-     {
-         let arr = []
-         for(let i of [0, 1])
-            arr[i] = (b[i] > a[i]) ? b[i] : a[i]
-         return arr
-     }, [0,0])
-     
+// create matrix for each parts
+const createMatrix = (coords) => 
+{
+    // get biggests X & Y
+    const [bX, bY] = coords.reduce((a, b) => 
+    {
+        let arr = []
+        for(let i of [0, 1])
+        arr[i] = (b[i] > a[i]) ? b[i] : a[i]
+        return arr
+    }, [0,0])
+    
     // create matrix
     const matrix = 
         new Array(bY + 1)
@@ -28,27 +27,37 @@ export const part1 = (inputs: TInputs) =>
         matrix[y][x] = "#"
     }
 
+    return matrix
+}
+
+export const part1 = (inputs: TInputs) =>
+ {
+    const [coords, folds] = inputs
+    const matrix = createMatrix(coords)
+
     // process fold
     // calc new value "v": 
     // v = f - (x-f)
-    log(folds)
     for (const [fAxis, fValue] of folds) 
     {
         if (fAxis === "y") {
 
+            // fold by removing arrays below Y fValue
             matrix.splice(fValue)
+
             for (const coord of coords) 
             {
                 const [x, y] = coord
                 if (y > fValue && matrix?.[fValue - (y - fValue)]?.[x])
                     matrix[fValue - (y - fValue)][x] = "#"
             }
-            // fold by removing arrays below Y fValue
         }
 
         if (fAxis === "x") {
 
+            // fold by removing arrays after X fValue
             matrix.map(y => y.splice(fValue))
+
             for (const coord of coords) 
             {
                 const [x, y] = coord
@@ -61,18 +70,58 @@ export const part1 = (inputs: TInputs) =>
         break
     }
     
-    log(matrix)
-
-
-    const counter = matrix.reduce((a,b) =>
+    return matrix.reduce((a,b) =>
         a + b.reduce((c,d) => d === "#" ? c+1 :c, 0)
     ,0)
 
-    log(counter)
-    return counter
-
  }
 
+
 export const part2 = (inputs: TInputs) => {
+
+    const [coords, folds] = inputs
+    const matrix = createMatrix(coords)
+
+    let newCoords = coords
+
+    // process fold
+    for (const [fAxis, fValue] of folds) 
+    {
+        if (fAxis === "y") {
+
+            for (const coord of newCoords) 
+            {
+                const [x, y] = coord
+                //log(coord)
+                if (matrix?.[fValue - (y - fValue)]?.[x])
+                    matrix[fValue - (y - fValue)][x] = "#"
+            }
+            
+            matrix.splice(fValue)
+
+        }
+
+        if (fAxis === "x") {
+
+            for (const coord of newCoords) 
+            {
+                const [x, y] = coord
+                if (matrix?.[y]?.[fValue - (x - fValue)])
+                    matrix[y][fValue - (x - fValue)] = "#"
+            }
+
+            matrix.map(y => y.splice(fValue))
+        }
+
+
+        newCoords = []
+        for(let y = 0; y < matrix.length; y++)
+            for(let x = 0; x < matrix[y].length; x++)
+                if (matrix[y][x] === "#") newCoords.push([x, y])
+        
+        log(matrix)
+        log(newCoords)
+    }
+
 
 }

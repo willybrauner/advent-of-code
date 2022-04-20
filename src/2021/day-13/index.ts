@@ -35,41 +35,33 @@ export const part1 = (inputs: TInputs) =>
     const [coords, folds] = inputs
     const matrix = createMatrix(coords)
 
-    // process fold
-    // calc new value "v": 
-    // v = f - (x-f)
-    for (const [fAxis, fValue] of folds) 
-    {
-        if (fAxis === "y") {
+    // get first coords
+    const [fAxis, fValue] = folds[0]
 
-            // fold by removing arrays below Y fValue
-            matrix.splice(fValue)
+    if (fAxis === "y") {
+        // fold by removing arrays below Y fValue
+        matrix.splice(fValue)
 
-            for (const coord of coords) 
-            {
-                const [x, y] = coord
-                if (y > fValue && matrix?.[fValue - (y - fValue)]?.[x])
-                    matrix[fValue - (y - fValue)][x] = "#"
-            }
+        for (const coord of coords) 
+        {
+            const [x, y] = coord
+            if (y > fValue && matrix?.[fValue - (y - fValue)]?.[x])
+                matrix[fValue - (y - fValue)][x] = "#"
         }
-
-        if (fAxis === "x") {
-
-            // fold by removing arrays after X fValue
-            matrix.map(y => y.splice(fValue))
-
-            for (const coord of coords) 
-            {
-                const [x, y] = coord
-                if (x > fValue && matrix?.[y]?.[fValue - (x - fValue)])
-                    matrix[y][fValue - (x - fValue)] = "#"
-            }
-        }
-        
-        // break for first part on first fold   
-        break
     }
-    
+
+    if (fAxis === "x") {
+        // fold by removing arrays after X fValue
+        matrix.map(y => y.splice(fValue))
+
+        for (const coord of coords) 
+        {
+            const [x, y] = coord
+            if (x > fValue && matrix?.[y]?.[fValue - (x - fValue)])
+                matrix[y][fValue - (x - fValue)] = "#"
+        }
+    }
+
     return matrix.reduce((a,b) =>
         a + b.reduce((c,d) => d === "#" ? c+1 :c, 0)
     ,0)
@@ -81,18 +73,15 @@ export const part2 = (inputs: TInputs) => {
 
     const [coords, folds] = inputs
     const matrix = createMatrix(coords)
-
     let newCoords = coords
 
-    // process fold
     for (const [fAxis, fValue] of folds) 
     {
-        if (fAxis === "y") {
-
+        if (fAxis === "y") 
+        {
             for (const coord of newCoords) 
             {
                 const [x, y] = coord
-                //log(coord)
                 if (matrix?.[fValue - (y - fValue)]?.[x])
                     matrix[fValue - (y - fValue)][x] = "#"
             }
@@ -102,8 +91,8 @@ export const part2 = (inputs: TInputs) => {
 
         }
 
-        if (fAxis === "x") {
-
+        if (fAxis === "x") 
+        {
             for (const coord of newCoords) 
             {
                 const [x, y] = coord

@@ -30,6 +30,7 @@ export const part1 = ([template, pairIntersections]: TInputs) =>
                         ){
                             tmplArr[i] = tmplArr[i][0] + pairInter[1]
                             tmpls = tmplArr.join('')
+                            break
                         }
                         
                         prev = tmplArr[p]
@@ -57,7 +58,36 @@ export const part1 = ([template, pairIntersections]: TInputs) =>
 
  }
 
-export const part2 = (inputs) => {
+
+
+export const part2 = ([template, pairIntersections]: TInputs) => 
+{
+
+    const counters = template.split("").reduce((a, b) => ({ ...a, [b]: a[b] ? a[b]+1 : 1 }), {})
+    log('counters',counters) // { N: 2, C: 1, B: 1 }
+
+    let step = 0
+    while(step < 1)
+    {
+
+        const pairs = []
+        for(let i = 0; i < template.length - 1; i++) 
+            pairs.push(template.slice(i , 2+i))
+        
+        log("pairs", pairs) //  [ 'NN', 'NC', 'CB' ]
+
+        // check in inputs how many times we get same pairs
+        for (let tPair of pairs) 
+            for (let [pPair, pValue] of pairIntersections)
+                if (tPair === pPair) {
+                    counters[pValue] ? counters[pValue]++ : counters[pValue] = 1
+                }
+
+        step++
+    }
+
+    log("counters",counters) // { N: 2, C: 2, B: 2, H: 1 }
+
 
 }
  

@@ -3,13 +3,14 @@
 import { TInputs } from "./inputs-format"
 const {log} = console
 
+const STEPS = 1
 
 export const part1 = ([template, pairIntersections]: TInputs) =>
  {
     let tmpls: string = template
     
     let step = 0
-    while(step < 10)
+    while(step < STEPS)
     {
         const tmpl = tmpls
         const tmplArr = tmpl.split("");
@@ -42,6 +43,7 @@ export const part1 = ([template, pairIntersections]: TInputs) =>
         step++
     }
 
+    log('tp', tmpls)
     const letterCounters = tmpls.split("").reduce((a, b) => ({
         ...a,
         [b]: a[b] ? a[b]+1 : 1
@@ -49,6 +51,8 @@ export const part1 = ([template, pairIntersections]: TInputs) =>
     
     const sortableCounters = Object.entries(letterCounters)
     .sort(([,a]:[string, number], [,b]:[string, number])=> a - b)
+
+    log('sortableCounters' ,sortableCounters)
 
     return  (
         (sortableCounters[sortableCounters.length - 1][1] as number) 
@@ -59,35 +63,55 @@ export const part1 = ([template, pairIntersections]: TInputs) =>
  }
 
 
+ 
+ export const part2 = ([template, pairIntersections]: TInputs) => 
+ {
+    log('------------------------------------------------------- PART 2')
 
-export const part2 = ([template, pairIntersections]: TInputs) => 
-{
-
-    const counters = template.split("").reduce((a, b) => ({ ...a, [b]: a[b] ? a[b]+1 : 1 }), {})
-    log('counters',counters) // { N: 2, C: 1, B: 1 }
+    const letters = template.split("").reduce((a, b) => ({ ...a, [b]: a[b] ? a[b]+1 : 1 }), {})
+    
+    const pairs = {}
+    for(let i = 0; i < template.length - 1; i++) 
+        pairs?.[template.slice(i , 2+i)] 
+            ? pairs[template.slice(i , 2+i)]++ 
+            : pairs[template.slice(i , 2+i)] = 1
 
     let step = 0
-    while(step < 1)
+    while(step < STEPS)
     {
-
-        const pairs = []
-        for(let i = 0; i < template.length - 1; i++) 
-            pairs.push(template.slice(i , 2+i))
-        
-        log("pairs", pairs) //  [ 'NN', 'NC', 'CB' ]
-
-        // check in inputs how many times we get same pairs
-        for (let tPair of pairs) 
-            for (let [pPair, pValue] of pairIntersections)
-                if (tPair === pPair) {
-                    counters[pValue] ? counters[pValue]++ : counters[pValue] = 1
-                }
+        //log("pairs", pairs) // { NN: 1, NC: 1, CB: 1 }
+        for (let tPair of Object.keys(pairs)) {
+            for (let [[l1, l2], insert] of pairIntersections) {
+                if (tPair === l1+l2) {
+                    pairs[l1+insert] ? pairs[l1+insert]++ : pairs[l1+insert] = 1
+                    pairs[insert+l2] ? pairs[insert+l2]++ : pairs[insert+l2] = 1        
+                }        
+            }
+        }
 
         step++
     }
 
-    log("counters",counters) // { N: 2, C: 2, B: 2, H: 1 }
+    log("pairs", pairs) 
 
+    for (let tPair of Object.keys(pairs)) {
+        for (let [[l1, l2], insert] of pairIntersections) {
+            if (tPair === l1+l2) {
+                 letters[insert] ? letters[insert] += pairs[tPair] : letters[insert] = 1
+            }
+        }
+    }
 
+    const sortableCounters = Object.entries(letters)
+    .sort(([,a]:[string, number], [,b]:[string, number])=> a - b)
+
+    log('sortableCounters',sortableCounters)
+
+    return  (
+        (sortableCounters[sortableCounters.length - 1][1] as number) 
+        - 
+        (sortableCounters[0][1] as number)
+    )
+    
 }
  

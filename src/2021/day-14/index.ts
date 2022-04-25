@@ -3,14 +3,15 @@
 import { TInputs } from "./inputs-format"
 const {log} = console
 
-const STEPS = 1
-
+/**
+ * Part 1
+ */
 export const part1 = ([template, pairIntersections]: TInputs) =>
  {
     let tmpls: string = template
     
     let step = 0
-    while(step < STEPS)
+    while(step < 10)
     {
         const tmpl = tmpls
         const tmplArr = tmpl.split("");
@@ -43,74 +44,86 @@ export const part1 = ([template, pairIntersections]: TInputs) =>
         step++
     }
 
-    log('tp', tmpls)
     const letterCounters = tmpls.split("").reduce((a, b) => ({
         ...a,
         [b]: a[b] ? a[b]+1 : 1
     }), {})
     
-    const sortableCounters = Object.entries(letterCounters)
+    const sortable = Object.entries(letterCounters)
     .sort(([,a]:[string, number], [,b]:[string, number])=> a - b)
 
-    log('sortableCounters' ,sortableCounters)
-
     return  (
-        (sortableCounters[sortableCounters.length - 1][1] as number) 
+        (sortable[sortable.length - 1][1] as number) 
         - 
-        (sortableCounters[0][1] as number)
+        (sortable[0][1] as number)
     )
 
  }
 
 
  
+ /**
+  *  Part 2
+  *  Should work for part 1 too.
+  */
  export const part2 = ([template, pairIntersections]: TInputs) => 
  {
-    log('------------------------------------------------------- PART 2')
 
-    const letters = template.split("").reduce((a, b) => ({ ...a, [b]: a[b] ? a[b]+1 : 1 }), {})
-    
-    const pairs = {}
-    for(let i = 0; i < template.length - 1; i++) 
-        pairs?.[template.slice(i , 2+i)] 
-            ? pairs[template.slice(i , 2+i)]++ 
-            : pairs[template.slice(i , 2+i)] = 1
+    let pairs = new Map();
+    for (let i = 0; i < template.length - 1; i++) 
+    {
+        const a = template[i];
+        const b = template[i + 1];
+        const pair = a + b;
+        pairs.set(pair, (pairs.get(pair) || 0) + 1);
+    }
 
     let step = 0
-    while(step < STEPS)
+    while(step < 40)
     {
-        //log("pairs", pairs) // { NN: 1, NC: 1, CB: 1 }
-        for (let tPair of Object.keys(pairs)) {
-            for (let [[l1, l2], insert] of pairIntersections) {
-                if (tPair === l1+l2) {
-                    pairs[l1+insert] ? pairs[l1+insert]++ : pairs[l1+insert] = 1
-                    pairs[insert+l2] ? pairs[insert+l2]++ : pairs[insert+l2] = 1        
-                }        
-            }
-        }
+        // create new pairs map on each
+        let newPairs = new Map();
 
+        for (let [pair, count] of pairs) {
+            const [l1, l2] = pair
+            const [,insert] = pairIntersections.find(e => e[0] === pair)
+            if (insert) {
+                const a = l1 + insert;
+                const b = insert + l2;
+                newPairs.set(a, count + (newPairs.get(a) || 0));
+                newPairs.set(b, count + (newPairs.get(b) || 0));
+            } 
+        }
+        pairs = newPairs;
         step++
     }
 
-    log("pairs", pairs) 
-
-    for (let tPair of Object.keys(pairs)) {
-        for (let [[l1, l2], insert] of pairIntersections) {
-            if (tPair === l1+l2) {
-                 letters[insert] ? letters[insert] += pairs[tPair] : letters[insert] = 1
-            }
-        }
+    // Calc totals
+    // ex: { N: 4, C: 4, B: 4, H: 2 }
+    const totals = {}; 
+    for (let [pair, count] of pairs) {
+        const [a, b] = pair
+        if (!totals[a]) totals[a] = 0;
+        if (!totals[b]) totals[b] = 0;
+        totals[a] += count;
+        totals[b] += count;
     }
 
-    const sortableCounters = Object.entries(letters)
-    .sort(([,a]:[string, number], [,b]:[string, number])=> a - b)
+    totals[template[0]]++;
+    totals[template[template.length - 1]]++;
+    // log("totals", totals)
 
-    log('sortableCounters',sortableCounters)
+    const sortable = Object.entries(totals)
+    // devide each values par 2
+    .map(([name, count]) => [name, (count as number) / 2])
+    .sort(([,a]:[string, number], [,b]:[string, number])=> a - b)
+    
+    //log('sortable',sortable)
 
     return  (
-        (sortableCounters[sortableCounters.length - 1][1] as number) 
+        (sortable[sortable.length - 1][1] as number) 
         - 
-        (sortableCounters[0][1] as number)
+        (sortable[0][1] as number)
     )
     
 }

@@ -8,43 +8,44 @@ export const part1 = (inputs:TInputs) =>
 
     let risk = inputs[0][0]
 
+    /**
+     * Prepare graph for dijkstras Algorithm
+     * ex: 
+     * 1163751742
+     * 1381373672
+     * 
+     const graph = [
+        {1: { next: 1, down: 1 }}, -> x 0, y 0 
+        {1: { next: 6, down: 3 }}, -> x 1, y 0 
+     ]
+     */
+     const graph = []
+
     const move = (pY = 0,pX = 0) =>  
     {
-        for (let y = pY; y < inputs.length; y+=1) {
-            for (let x = pX; x < inputs[y].length; x+=1) {
-                const dirs = {
-                    // up: [y-1,x],
-                    // prev: [y,x-1],
-                    next: [y,x+1],
-                    down: [y+1,x],
-                }
-                const dirsArr: [string, number[]][] = Object.entries(dirs)
-
-                const getValue = ([y,x]:number[]) => inputs?.[y]?.[x]
+        for (let y = pY; y < inputs.length; y+=1) 
+        {
+            for (let x = pX; x < inputs[y].length; x+=1) 
+            {
+    
+                const curr = inputs?.[y]?.[x],
+                      up   = inputs?.[y-1]?.[x],
+                      down = inputs?.[y+1]?.[x],
+                      prev = inputs?.[y]?.[x-1],
+                      next = inputs?.[y]?.[x+1]
                 
-                const selected = dirsArr.reduce((a,b) => 
-                     getValue(a[1]) < getValue(b[1]) ? a : b
-                , dirsArr[0]);
-
-                const [dir, [sY, sX]] = selected
-                // log("--selected",selected, getValue([sY, sX]))
-                                
-                if (inputs?.[sY]?.[sX]) 
-                    risk += inputs[sY][sX]
-                
-                if (!inputs?.[y+1]?.[x] && !inputs?.[y]?.[x+1]){
-                    log('No down & no right, stop here')
-                    break
-                }
-                
-                return move(sY, sX)
+                graph.push({
+                    [curr]: { next, down }
+                })                    
                 
             }
-        
+
         }
     }
+
     move()
 
+    log('graph',graph, graph.length)
     log('risk',risk)
  }
 

@@ -9,7 +9,6 @@ type TGraph = { [x: string]: { [x: string]: string } }
  * @param graph
  * @param start
  * @param end
- * @returns
  */
 function dijkstra(graph: TGraph, start?: string, end?: string) {
   const vertices: string[] = Object.keys(graph)
@@ -23,13 +22,27 @@ function dijkstra(graph: TGraph, start?: string, end?: string) {
   let dist = {}
   let isVisited = {}
   let verticePathFrom = {}
+
+  // loop on vertices who are coordinates (ex: 0,0 / 0,1 etc...)
   for (let i = 0; i < vertices.length; i++) {
+
+    // if is startNode (0,0) register, 0 to distance counter on this node
+    // { '0,0': 0 }
     if (vertices[i] === startNode) {
-      dist[vertices[i]] = 0
-    } else {
+      dist[vertices[i]] = 0  
+    } 
+    // else, register infinity
+    // ex: { '9,4': Infinity }
+    else {
       dist[vertices[i]] = Infinity
     }
+
+    // register vertice Path from
+    // { '0,0': { '0,1': 1, '1,0': 1 } }
     verticePathFrom[vertices[i]] = vertices[i]
+    
+    // register visited status on it
+    // { '0,0': }
     isVisited[vertices[i]] = false
   }
 
@@ -37,7 +50,6 @@ function dijkstra(graph: TGraph, start?: string, end?: string) {
   while (currentVisited !== null) {
     let edges = adjVertices[currentVisited]
     let distance = dist[currentVisited]
-    //console.log('1',edges, distance)
     for (const key in edges) {
       let newDistance = distance + edges[key]
 
@@ -60,8 +72,6 @@ function dijkstra(graph: TGraph, start?: string, end?: string) {
     currentVisited = currVertice
   }
 
-  //return { dist, verticePathFrom, isVisited }
-  // return risk
   return { dist, risk: dist[endNode] }
 }
 
@@ -102,14 +112,17 @@ const buildGraph = (inputs: TInputs) => {
       })
     }
   }
-
   return graph
 }
 
-const buildFiveDimensionGraph = (inputs: TInputs) => {
+/**
+ * Build 5 dimensions graph
+ * @param inputs 
+ * @returns 
+ */
+const buildFiveDimensionsInputs = (inputs: TInputs) => {
   // get horizontal grid lines
   let LINES = []
-
   for (const line of inputs) {
     const newLine = [line]
     for (let j = 1; j < 5; j++) {
@@ -122,31 +135,24 @@ const buildFiveDimensionGraph = (inputs: TInputs) => {
         })
       )
     }
-
-    log("newLine", newLine.flat().join(""))
     LINES.push(newLine.flat())
   }
 
-
-  // TODO 
-  const VERTICALS = []
-  for (let i = 1; i <= 5; i++) {
-    for (const line of LINES) {
-      
-      VERTICALS.push(
-        line.map((a) => {
-          let v = a + i
-          if (v > 9) v = 1
-          return v
-        })
-      )
+  let VERTICALS = [...LINES]
+  for (let i = 0; i < 4; i++) {
+    const newLines = [];
+    for (const line of VERTICALS.slice(i*10)) {
+      const l = line.map((a) => {
+        let v = a + 1
+        if (v > 9) v = 1
+        return v
+      })
+      newLines.push(l)
     }
-    log("VERTICALS",VERTICALS.map(e => e.join('')))
-     log("-----------------------")
-     if (i === 2) {break}
+    VERTICALS = [...VERTICALS, ...newLines]
   }
 
-  //log("LINES", LINES)
+  return VERTICALS
 }
 
 // ----------------------------------------------------------------------------------
@@ -158,9 +164,8 @@ export const part1 = (inputs: TInputs) => {
 }
 
 export const part2 = (inputs) => {
-  const fiveDimensionsGraph = buildFiveDimensionGraph(inputs)
-  log("fiveDimensionsGraph", fiveDimensionsGraph)
-  const graph = buildGraph(inputs)
+  const fiveDimensionsInputs = buildFiveDimensionsInputs(inputs)
+  const graph = buildGraph(fiveDimensionsInputs)
   const { risk } = dijkstra(graph)
-  return risk - inputs[0][0]
+  return risk
 }

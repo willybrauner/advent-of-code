@@ -42,7 +42,7 @@ function dijkstra(graph: TGraph, start?: string, end?: string) {
     verticePathFrom[vertices[i]] = vertices[i]
     
     // register visited status on it
-    // { '0,0': }
+    // { '0,0': false }
     isVisited[vertices[i]] = false
   }
 

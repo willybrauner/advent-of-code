@@ -21,50 +21,29 @@ function dijkstra(pGraph: TGraph, start?: string, end?: string) {
   const endNode: string = end || nodes[nodes.length - 1]
 
   // prepare
-  let dist = {}
+  let distances = { [startNode]: 0 }
   let isVisited = {}
-
-  // loop on vertices who are coordinates (ex: 0,0 / 0,1 etc...)
-  for (let i = 0; i < nodes.length; i++) {
-    // if is startNode (0,0) register, 0 to distance counter on this node { '0,0': 0 }
-    if (nodes[i] === startNode) {
-      dist[nodes[i]] = 0
-    }
-    // else, register infinity, ex: { '9,4': Infinity }
-    else {
-      // dist[nodes[i]] = Infinity
-    }
-    // register visited status on it. ex: { '0,0': false }
-    isVisited[nodes[i]] = false
-  }
-
-  // start
   let currentVisitedNode = startNode
 
   // loop until current visitied exist
-  while (currentVisitedNode !== null) {
+  while (currentVisitedNode) {
     // get current visited adjacent nodes
     let adjNodes = graph[currentVisitedNode]
 
     // loop on adjNodes keys ex: 5,3 , 6,2
     for (const key in adjNodes) {
       // new distance is the registered distance for this current node + adjacent key value / ex: adjNodes { '6,8': 2, '7,7': 6 }, key is 7,7, adjNodes[key] is 6
-      let newDistance = dist[currentVisitedNode] + adjNodes[key]
-      // log('newDistance',newDistance)
-
+      let newDistance: any = distances[currentVisitedNode] + adjNodes[key]
       // register in dist only if new distance is smallest to existing
-      if (newDistance < (dist[key] || Infinity)) {
-        dist[key] = newDistance
+      if (newDistance < (distances[key] || Infinity)) {
+        distances[key] = newDistance
       }
     }
 
     // flag as visited node
     isVisited[currentVisitedNode] = true
 
-    let minDistance = Infinity
-    let currNode = null
-    
-    // create filtered dist bedore iteration doesn't slow down, because it creates a new Object 
+    // create filtered dist bedore iteration doesn't slow down, because it creates a new Object
     // on each iteration
 
     // const filteredDist = Object.keys(dist).reduce(
@@ -75,10 +54,12 @@ function dijkstra(pGraph: TGraph, start?: string, end?: string) {
     //   {}
     // )
 
-    //log("filteredDist",filteredDist)
-    for (const key in dist) {
-      if (dist[key] < minDistance && isVisited[key] !== true) {
-        minDistance = dist[key]
+    let minDistance = Infinity
+    let currNode = null
+  
+    for (const key in distances) {
+      if (distances[key] < minDistance && isVisited[key] !== true) {
+        minDistance = distances[key]
         currNode = key
       }
     }
@@ -86,7 +67,7 @@ function dijkstra(pGraph: TGraph, start?: string, end?: string) {
     currentVisitedNode = currNode
   }
 
-  return { dist, risk: dist[endNode] }
+  return { distances, risk: distances[endNode] }
 }
 
 /**

@@ -2,7 +2,44 @@
 import { TInputs } from "./inputs-format"
 const { log } = console
 
-type TGraph = { [x: string]: { [x: string]: string } }
+
+
+/**
+ * Priority queue 
+ * places elements in order based on the weight each element has
+ * @link https://medium.com/@adriennetjohnson/a-walkthrough-of-dijkstras-algorithm-in-javascript-e94b74192026
+ */
+class PriorityQueue {
+  collection: any[] = []
+  enqueue(element): void {
+    if (this.isEmpty()) {
+      this.collection.push(element)
+    } else {
+      let added = false
+      for (let i = 1; i <= this.collection.length; i++) {
+        if (element[1] < this.collection[i - 1][1]) {
+          this.collection.splice(i - 1, 0, element)
+          added = true
+          break
+        }
+      }
+      if (!added) {
+        this.collection.push(element)
+      }
+    }
+  }
+  dequeue() {
+    let value = this.collection.shift()
+    return value
+  }
+  isEmpty():boolean {
+    return this.collection.length === 0
+  }
+}
+
+
+
+
 
 /**
  * Process dijkstra algo on graph
@@ -10,6 +47,8 @@ type TGraph = { [x: string]: { [x: string]: string } }
  * @param start
  * @param end
  */
+ type TGraph = { [x: string]: { [x: string]: string } }
+
 function dijkstra(pGraph: TGraph, start?: string, end?: string) {
   // adjacent nodes
   const graph: TGraph = pGraph
@@ -23,48 +62,30 @@ function dijkstra(pGraph: TGraph, start?: string, end?: string) {
   // prepare
   let distances = { [startNode]: 0 }
   let isVisited = {}
-  let currentVisitedNode = startNode
+  // create priority quey instance
+  let priorityQueue = new PriorityQueue();
+  priorityQueue.enqueue([startNode, 0]);
 
   // loop until current visitied exist
-  while (currentVisitedNode) {
-    // get current visited adjacent nodes
-    let adjNodes = graph[currentVisitedNode]
+  while (!priorityQueue.isEmpty()) {
+
+    let shortestStep = priorityQueue.dequeue();
+    let currentNode = shortestStep[0];
+    let adjNodes = graph[currentNode]
 
     // loop on adjNodes keys ex: 5,3 , 6,2
     for (const key in adjNodes) {
       // new distance is the registered distance for this current node + adjacent key value / ex: adjNodes { '6,8': 2, '7,7': 6 }, key is 7,7, adjNodes[key] is 6
-      let newDistance: any = distances[currentVisitedNode] + adjNodes[key]
+      let newDistance: any = distances[currentNode] + adjNodes[key]
       // register in dist only if new distance is smallest to existing
       if (newDistance < (distances[key] || Infinity)) {
         distances[key] = newDistance
+        priorityQueue.enqueue([key, newDistance]);
       }
     }
 
     // flag as visited node
-    isVisited[currentVisitedNode] = true
-
-    // create filtered dist bedore iteration doesn't slow down, because it creates a new Object
-    // on each iteration
-
-    // const filteredDist = Object.keys(dist).reduce(
-    //   (a, b) => ({
-    //     ...a,
-    //     ...(dist[b] !== Infinity ? { [b]: dist[b] } : {}),
-    //   }),
-    //   {}
-    // )
-
-    let minDistance = Infinity
-    let currNode = null
-  
-    for (const key in distances) {
-      if (distances[key] < minDistance && isVisited[key] !== true) {
-        minDistance = distances[key]
-        currNode = key
-      }
-    }
-
-    currentVisitedNode = currNode
+    isVisited[currentNode] = true
   }
 
   return { distances, risk: distances[endNode] }
@@ -162,5 +183,5 @@ export const part2 = (inputs) => {
   const fiveDimensionsInputs = buildFiveDimensionsInputs(inputs)
   const graph = buildGraph(fiveDimensionsInputs)
   const { risk } = dijkstra(graph)
-  return risk
+  return risk - inputs[0][0]
 }

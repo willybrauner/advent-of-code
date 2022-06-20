@@ -10,66 +10,80 @@ type TGraph = { [x: string]: { [x: string]: string } }
  * @param start
  * @param end
  */
-function dijkstra(graph: TGraph, start?: string, end?: string) {
-  const vertices: string[] = Object.keys(graph)
-  const adjVertices: TGraph = graph
+function dijkstra(pGraph: TGraph, start?: string, end?: string) {
+  // adjacent nodes
+  const graph: TGraph = pGraph
+  // nodes list
+  const nodes: string[] = Object.keys(graph)
   // if start node is node is not defined, use first vertice
-  const startNode: string = start || vertices[0]
+  const startNode: string = start || nodes[0]
   // if end node is node is not defined, use last vertice
-  const endNode: string = end || vertices[vertices.length - 1]
+  const endNode: string = end || nodes[nodes.length - 1]
 
   // prepare
   let dist = {}
   let isVisited = {}
-  let verticePathFrom = {}
 
   // loop on vertices who are coordinates (ex: 0,0 / 0,1 etc...)
-  for (let i = 0; i < vertices.length; i++) {
-
-    // if is startNode (0,0) register, 0 to distance counter on this node
-    // { '0,0': 0 }
-    if (vertices[i] === startNode) {
-      dist[vertices[i]] = 0  
-    } 
-    // else, register infinity
-    // ex: { '9,4': Infinity }
-    else {
-      dist[vertices[i]] = Infinity
+  for (let i = 0; i < nodes.length; i++) {
+    // if is startNode (0,0) register, 0 to distance counter on this node { '0,0': 0 }
+    if (nodes[i] === startNode) {
+      dist[nodes[i]] = 0
     }
-
-    // register vertice Path from
-    // { '0,0': { '0,1': 1, '1,0': 1 } }
-    verticePathFrom[vertices[i]] = vertices[i]
-    
-    // register visited status on it
-    // { '0,0': false }
-    isVisited[vertices[i]] = false
+    // else, register infinity, ex: { '9,4': Infinity }
+    else {
+      // dist[nodes[i]] = Infinity
+    }
+    // register visited status on it. ex: { '0,0': false }
+    isVisited[nodes[i]] = false
   }
 
-  let currentVisited = startNode
-  while (currentVisited !== null) {
-    let edges = adjVertices[currentVisited]
-    let distance = dist[currentVisited]
-    for (const key in edges) {
-      let newDistance = distance + edges[key]
+  // start
+  let currentVisitedNode = startNode
 
-      if (newDistance < dist[key]) {
+  // loop until current visitied exist
+  while (currentVisitedNode !== null) {
+    // get current visited adjacent nodes
+    let adjNodes = graph[currentVisitedNode]
+
+    // loop on adjNodes keys ex: 5,3 , 6,2
+    for (const key in adjNodes) {
+      // new distance is the registered distance for this current node + adjacent key value / ex: adjNodes { '6,8': 2, '7,7': 6 }, key is 7,7, adjNodes[key] is 6
+      let newDistance = dist[currentVisitedNode] + adjNodes[key]
+      // log('newDistance',newDistance)
+
+      // register in dist only if new distance is smallest to existing
+      if (newDistance < (dist[key] || Infinity)) {
         dist[key] = newDistance
-        verticePathFrom[key] = currentVisited
       }
     }
-    isVisited[currentVisited] = true
+
+    // flag as visited node
+    isVisited[currentVisitedNode] = true
 
     let minDistance = Infinity
-    let currVertice = null
+    let currNode = null
+    
+    // create filtered dist bedore iteration doesn't slow down, because it creates a new Object 
+    // on each iteration
+
+    // const filteredDist = Object.keys(dist).reduce(
+    //   (a, b) => ({
+    //     ...a,
+    //     ...(dist[b] !== Infinity ? { [b]: dist[b] } : {}),
+    //   }),
+    //   {}
+    // )
+
+    //log("filteredDist",filteredDist)
     for (const key in dist) {
       if (dist[key] < minDistance && isVisited[key] !== true) {
         minDistance = dist[key]
-        currVertice = key
+        currNode = key
       }
     }
 
-    currentVisited = currVertice
+    currentVisitedNode = currNode
   }
 
   return { dist, risk: dist[endNode] }
@@ -117,8 +131,8 @@ const buildGraph = (inputs: TInputs) => {
 
 /**
  * Build 5 dimensions graph
- * @param inputs 
- * @returns 
+ * @param inputs
+ * @returns
  */
 const buildFiveDimensionsInputs = (inputs: TInputs) => {
   // get horizontal grid lines
@@ -140,8 +154,8 @@ const buildFiveDimensionsInputs = (inputs: TInputs) => {
 
   let VERTICALS = [...LINES]
   for (let i = 0; i < 4; i++) {
-    const newLines = [];
-    for (const line of VERTICALS.slice(i*10)) {
+    const newLines = []
+    for (const line of VERTICALS.slice(i * 10)) {
       const l = line.map((a) => {
         let v = a + 1
         if (v > 9) v = 1

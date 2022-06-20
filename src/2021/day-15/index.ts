@@ -38,9 +38,6 @@ class PriorityQueue {
 }
 
 
-
-
-
 /**
  * Process dijkstra algo on graph
  * @param graph
@@ -122,8 +119,8 @@ const buildGraph = (inputs: TInputs) => {
         [key]: {
           ...(next ? { [`${y},${x + 1}`]: next } : {}),
           ...(down ? { [`${y + 1},${x}`]: down } : {}),
-          // ...(prev ? { [`${y},${x - 1}`]: prev } : {}),
-          // ...(up ? { [`${y - 1},${x}`]: up } : {}),
+          ...(prev ? { [`${y},${x - 1}`]: prev } : {}),
+          ...(up ? { [`${y - 1},${x}`]: up } : {}),
         },
       })
     }
@@ -176,12 +173,12 @@ const buildFiveDimensionsInputs = (inputs: TInputs) => {
 export const part1 = (inputs: TInputs) => {
   const graph = buildGraph(inputs)
   const { risk } = dijkstra(graph)
-  return risk - inputs[0][0]
+  return risk
 }
 
 export const part2 = (inputs) => {
   const fiveDimensionsInputs = buildFiveDimensionsInputs(inputs)
   const graph = buildGraph(fiveDimensionsInputs)
   const { risk } = dijkstra(graph)
-  return risk - inputs[0][0]
+  return risk
 }

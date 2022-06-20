@@ -4,7 +4,7 @@ const {log} = console
 
 it("Part 1 example", () => {
   const inputs = formatInputs("inputs.txt")
-  // console.log( part1(inputs) )
+   console.log( part1(inputs) )
    //expect(part1(inputs)).toBe(527)
 })
 

@@ -2,41 +2,36 @@
 import { TInputs } from "./inputs-format"
 const { log } = console
 
-
-
 /**
- * Priority queue 
- * places elements in order based on the weight each element has
- * @link https://medium.com/@adriennetjohnson/a-walkthrough-of-dijkstras-algorithm-in-javascript-e94b74192026
+ * Priority queue
  */
-class PriorityQueue {
-  collection: any[] = []
-  enqueue(element): void {
-    if (this.isEmpty()) {
-      this.collection.push(element)
+type TQueueElement = [coord: string, value: number]
+function priorityQueue() {
+  const collection: TQueueElement[] = []
+  const isEmpty = (): boolean => collection.length === 0
+  const enqueue = (element: TQueueElement): void => {
+    if (isEmpty()) {
+      collection.push(element)
     } else {
       let added = false
-      for (let i = 1; i <= this.collection.length; i++) {
-        if (element[1] < this.collection[i - 1][1]) {
-          this.collection.splice(i - 1, 0, element)
+      for (let i = 1; i <= collection.length; i++) {
+        if (element[1] < collection[i - 1][1]) {
+          collection.splice(i - 1, 0, element)
           added = true
           break
         }
       }
       if (!added) {
-        this.collection.push(element)
+        collection.push(element)
       }
     }
   }
-  dequeue() {
-    let value = this.collection.shift()
+  const dequeue = (): TQueueElement => {
+    let value = collection.shift()
     return value
   }
-  isEmpty():boolean {
-    return this.collection.length === 0
-  }
+  return Object.freeze({ isEmpty, dequeue, enqueue })
 }
-
 
 /**
  * Process dijkstra algo on graph
@@ -44,79 +39,60 @@ class PriorityQueue {
  * @param start
  * @param end
  */
- type TGraph = { [x: string]: { [x: string]: string } }
-
-function dijkstra(pGraph: TGraph, start?: string, end?: string) {
-  // adjacent nodes
-  const graph: TGraph = pGraph
-  // nodes list
+function dijkstra(
+  pGraph: { [x: string]: { [x: string]: string } },
+  start?: string,
+  end?: string
+) {
+  const graph = pGraph
   const nodes: string[] = Object.keys(graph)
-  // if start node is node is not defined, use first vertice
   const startNode: string = start || nodes[0]
-  // if end node is node is not defined, use last vertice
   const endNode: string = end || nodes[nodes.length - 1]
+  const distances = { [startNode]: 0 }
 
-  // prepare
-  let distances = { [startNode]: 0 }
-  let isVisited = {}
-  // create priority quey instance
-  let priorityQueue = new PriorityQueue();
-  priorityQueue.enqueue([startNode, 0]);
+  const queue = priorityQueue()
+  queue.enqueue([startNode, 0])
 
-  // loop until current visitied exist
-  while (!priorityQueue.isEmpty()) {
-
-    let shortestStep = priorityQueue.dequeue();
-    let currentNode = shortestStep[0];
-    let adjNodes = graph[currentNode]
+  while (!queue.isEmpty()) {
+    const shortestNode = queue.dequeue() // ex: [ '8,6', 37 ]
+    const currentNode = shortestNode[0]
+    const adjNodes = graph[currentNode]
 
     // loop on adjNodes keys ex: 5,3 , 6,2
-    for (const key in adjNodes) {
+    for (const coord in adjNodes) {
       // new distance is the registered distance for this current node + adjacent key value / ex: adjNodes { '6,8': 2, '7,7': 6 }, key is 7,7, adjNodes[key] is 6
-      let newDistance: any = distances[currentNode] + adjNodes[key]
-      // register in dist only if new distance is smallest to existing
-      if (newDistance < (distances[key] || Infinity)) {
-        distances[key] = newDistance
-        priorityQueue.enqueue([key, newDistance]);
+      let newDistance: any = distances[currentNode] + adjNodes[coord]
+      if (newDistance < (distances[coord] || Infinity)) {
+        distances[coord] = newDistance
+        queue.enqueue([coord, newDistance])
       }
     }
-
-    // flag as visited node
-    isVisited[currentNode] = true
   }
-
-  return { distances, risk: distances[endNode] }
+  return { risk: distances[endNode] }
 }
 
 /**
-   * Prepare graph for dijkstras Algorithm
-   * ex: 
-   * 1163751742
-   * 1381373672
-   * 
-   const graph = {
-    // coor : { nex, down, prev, up }
-    '0,0': { '0,1': 1, '1,0': 1 },
-    '0,1': { '0,2': 6, '1,1': 3, '0,0': 1 },
-    ...
-    }
-*/
+ * Prepare graph for dijkstras Algorithm
+ * ex:
+ * 1163751742
+ * 1381373672
+ *
+ *   {
+ *    '0,0': { '0,1': 1, '1,0': 1 },
+ *    '0,1': { '0,2': 6, '1,1': 3, '0,0': 1 },
+ *     ...
+ *   }
+ */
 const buildGraph = (inputs: TInputs) => {
   const graph = {}
-
-  // prepare graph reprentation
   for (let y = 0; y < inputs.length; y += 1) {
     for (let x = 0; x < inputs[y].length; x += 1) {
-      const curr = inputs?.[y]?.[x],
-        up = inputs?.[y - 1]?.[x],
+      const up = inputs?.[y - 1]?.[x],
         down = inputs?.[y + 1]?.[x],
         prev = inputs?.[y]?.[x - 1],
         next = inputs?.[y]?.[x + 1]
-
-      let key = `${y},${x}`
-
       Object.assign(graph, {
-        [key]: {
+        [`${y},${x}`]: {
           ...(next ? { [`${y},${x + 1}`]: next } : {}),
           ...(down ? { [`${y + 1},${x}`]: down } : {}),
           ...(prev ? { [`${y},${x - 1}`]: prev } : {}),
@@ -129,56 +105,26 @@ const buildGraph = (inputs: TInputs) => {
 }
 
 /**
- * Build 5 dimensions graph
+ * Build 5 dimensions inputs
  * @param inputs
- * @returns
+ * @credits https://github.com/superguigui/AoC-2021/blob/main/15/index.js
  */
 const buildFiveDimensionsInputs = (inputs: TInputs) => {
-  // get horizontal grid lines
-  let LINES = []
-  for (const line of inputs) {
-    const newLine = [line]
-    for (let j = 1; j < 5; j++) {
-      // increment each risk of this line
-      newLine.push(
-        newLine[newLine.length - 1].map((a) => {
-          let v = a + 1
-          if (v > 9) v = 1
-          return v
-        })
-      )
-    }
-    LINES.push(newLine.flat())
-  }
-
-  let VERTICALS = [...LINES]
-  for (let i = 0; i < 4; i++) {
-    const newLines = []
-    for (const line of VERTICALS.slice(i * 10)) {
-      const l = line.map((a) => {
-        let v = a + 1
-        if (v > 9) v = 1
-        return v
-      })
-      newLines.push(l)
-    }
-    VERTICALS = [...VERTICALS, ...newLines]
-  }
-
-  return VERTICALS
+  const [h, w] = [inputs.length, inputs[0].length]
+  return [...Array(h * 5)].map((_, y) =>
+    [...Array(w * 5)].map(
+      (_, x) => ((inputs[y % h][x % w] + ~~(y / h) + ~~(x / w) - 1) % 9) + 1
+    )
+  )
 }
 
-// ----------------------------------------------------------------------------------
-
-export const part1 = (inputs: TInputs) => {
+export const part1 = (inputs: TInputs): number => {
   const graph = buildGraph(inputs)
-  const { risk } = dijkstra(graph)
-  return risk
+  return dijkstra(graph).risk
 }
 
-export const part2 = (inputs) => {
+export const part2 = (inputs: TInputs): number => {
   const fiveDimensionsInputs = buildFiveDimensionsInputs(inputs)
   const graph = buildGraph(fiveDimensionsInputs)
-  const { risk } = dijkstra(graph)
-  return risk
+  return dijkstra(graph).risk
 }

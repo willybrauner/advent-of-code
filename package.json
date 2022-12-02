@@ -17,6 +17,7 @@
     "typescript": "^4.9.3"
   },
   "prettier": {
-    "semi": false
+    "semi": false,
+    "singleQuote": true
   }
 }

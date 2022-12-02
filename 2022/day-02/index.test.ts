@@ -3,12 +3,10 @@ const { log } = console
 
 it("resolve part 1", () => {
   const input = format("input.test.txt")
-  part1(input)
-  // expect(part1(input)).toBe( )
+  expect(part1(input)).toBe(15)
 })
 
 it("resolve part 2", () => {
   const input = format("input.test.txt")
-  part2(input)
-  //expect(part2(input)).toBe( )
+  expect(part2(input)).toBe(12)
 })

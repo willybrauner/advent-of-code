@@ -23,7 +23,7 @@ export const part1 = (input: TInput = format('input.test.txt')) =>
     ]
     const common = [...new Set(part1.filter((e) => part2.includes(e)))][0]
     const position = common.toLowerCase().charCodeAt(0) - 96
-                    + (common === common.toUpperCase() ? 26 : 0)
+      + (common === common.toUpperCase() ? 26 : 0)
     return (a || 0) + position
   }, 0)
 

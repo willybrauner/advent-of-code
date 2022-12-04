@@ -3,10 +3,10 @@ const { log } = console
 
 it("resolve part 1", () => {
   log(part1())
-  // expect(part1(input)).toBe( )
+  // expect(part1()).toBe( )
 })
 
 it("resolve part 2", () => {
-  log(part2())
-  //expect(part2(input)).toBe( )
+  // log(part2())
+  //expect(part2()).toBe( )
 })

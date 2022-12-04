@@ -12,10 +12,17 @@ export type TInput = any
 export const format = (filename: 'input.test.txt' | 'input.txt'): TInput =>
   fs.readFileSync(path.resolve(__dirname, filename), 'utf8')
 
-export const part1 = (input: TInput = format("input.test.txt")) => {
+/**
+ * Part 1
+ */
+export const part1 = (input: TInput = format('input.test.txt')) =>
+{
   log(input)
 }
 
-export const part2 = (input: TInput = format("input.test.txt")) => {
+/**
+ * part2
+ */
+export const part2 = (input: TInput = format('input.test.txt')) => {
 
 }

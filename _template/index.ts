@@ -5,24 +5,20 @@
 
 import fs from 'fs'
 import path from 'path'
-const { log } = console
 
 export type TInput = any
 
-export const format = (filename: 'input.test.txt' | 'input.txt'): TInput =>
+export const format = (filename: 'input.test' | 'input'): TInput =>
   fs.readFileSync(path.resolve(__dirname, filename), 'utf8')
 
 /**
  * Part 1
  */
-export const part1 = (input: TInput = format('input.test.txt')) =>
-{
-  log(input)
+export const part1 = (input: TInput = format('input.test')) => {
+  return input
 }
 
 /**
  * part2
  */
-export const part2 = (input: TInput = format('input.test.txt')) => {
-
-}
+export const part2 = (input: TInput = format('input.test')) => {}

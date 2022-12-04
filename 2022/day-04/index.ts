@@ -11,6 +11,8 @@ export type TInput = Set<any>[][]
 
 /**
  * Return Sets of numbers
+ * convert each line [ '2-4', '6-8' ]
+ * to Set(3) { 2, 3, 4 } Set(3) { 6, 7, 8 }
  */
 export const format = (filename: 'input.test.txt' | 'input.txt'): TInput =>
   fs
@@ -19,8 +21,6 @@ export const format = (filename: 'input.test.txt' | 'input.txt'): TInput =>
     .filter((e) => e)
     .map((e) => e.split(','))
     .map((e) =>
-      // convert: [ '2-4', '6-8' ]
-      // to: Set(3) { 2, 3, 4 } Set(3) { 6, 7, 8 }
       e.reduce((prev: Set<any>[], curr: string): Set<any>[] => {
         const nums = curr.split('-').map((e) => parseInt(e))
         const suite = new Set()
@@ -34,9 +34,8 @@ export const format = (filename: 'input.test.txt' | 'input.txt'): TInput =>
  */
 export const part1 = (input: TInput = format('input.test.txt')) =>
   input.reduce((a, [set1, set2]) => {
-    const intersectSet = new Set([...set1].filter((x) => set2.has(x)))
-    const match =
-      intersectSet.size === set1.size || intersectSet.size === set2.size
+    const intersect = new Set([...set1].filter((x) => set2.has(x)))
+    const match = [set1, set2].some((e) => intersect.size === e.size)
     return a + (match ? 1 : 0)
   }, 0)
 
@@ -45,6 +44,6 @@ export const part1 = (input: TInput = format('input.test.txt')) =>
  */
 export const part2 = (input: TInput = format('input.test.txt')) =>
   input.reduce((a, [set1, set2]) => {
-    const intersectSet = new Set([...set1].filter((x) => set2.has(x)))
-    return a + (intersectSet.size ? 1 : 0)
+    const intersect = new Set([...set1].filter((x) => set2.has(x)))
+    return a + (intersect.size ? 1 : 0)
   }, 0)

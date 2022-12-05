@@ -5,7 +5,6 @@
 
 import fs from 'fs'
 import path from 'path'
-import { log } from 'util'
 
 type TStacks = string[][]
 type TProcess = { move: number; from: number; to: number }[]
@@ -19,8 +18,8 @@ export const format = (filename: 'input.test' | 'input'): TInput => {
 
   /**
    *  [
-   *       [ '', '[N]', '[Z]', '1' ],
-   *       [ '[D]', '[C]', '[M]', '2' ],
+   *       [ '', '[N]', '[Z]' ],
+   *       [ '[D]', '[C]', '[M]' ],
    *       [ '[P]', '3' ]
    *  ]
    */
@@ -42,8 +41,6 @@ export const format = (filename: 'input.test' | 'input'): TInput => {
   // remove last item (number) from each row
   // [ '', '[N]', '[Z]', '1' ] -> [ '', '[N]', '[Z]' ]
   stacks = stacks.map((e) => e.pop() && e)
-
-  console.log(stacks)
 
   /**
    *   [
@@ -70,7 +67,9 @@ export const format = (filename: 'input.test' | 'input'): TInput => {
 /**
  * Part 1
  */
-export const part1 = ({ stacks, process }: TInput = format('input')) => {
+export const part1 = (
+  { stacks, process }: TInput = format('input.test')
+): string => {
   for (let i = 0; i < process.length; i++) {
     const pro = process[i]
     const els = stacks[pro.from - 1].splice(0, pro.move)
@@ -82,4 +81,13 @@ export const part1 = ({ stacks, process }: TInput = format('input')) => {
 /**
  * part2
  */
-export const part2 = (input: TInput = format('input.test')) => {}
+export const part2 = (
+  { stacks, process }: TInput = format('input.test')
+): string => {
+  for (let i = 0; i < process.length; i++) {
+    const pro = process[i]
+    const els = stacks[pro.from - 1].splice(0, pro.move)
+    stacks[pro.to - 1] = [...els, ...stacks[pro.to - 1]]
+  }
+  return stacks.map((e) => e[0]).join('')
+}

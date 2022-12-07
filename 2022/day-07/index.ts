@@ -152,9 +152,9 @@ export const part1 = (input: TInput = format('input.test')) => {
 /**
  * part2
  */
-export const part2 = (input: TInput = format('input.test')) => {
+export const part2 = (input: TInput = format('input')) => {
   const sums = getAllSums(input)
-  const bigger = sums.sort((a, b) => b - a)[0]
-  log('bigger', bigger)
-  return sums.filter((e) => 70000000 - e >= 30000000).sort((a, b) => b - a)
+  // const bigger = sums.sort((a, b) => b - a)[0]
+  // log('bigger', bigger)
+  return sums.filter((e) => 70000000 - e >= 30000000).sort((a, b) => b - a)[0]
 }

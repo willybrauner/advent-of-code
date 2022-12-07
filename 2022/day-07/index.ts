@@ -112,40 +112,38 @@ export const format = (filename: 'input.test' | 'input'): TInput => {
   return read()
 }
 
+// get sums of each values in object and nested obj
+const sumNumbersInObjects = (obj): number => {
+  let sum = 0
+  for (const key in obj) {
+    if (typeof obj[key] === 'number') {
+      sum += obj[key]
+    } else if (typeof obj[key] === 'object') {
+      sum += sumNumbersInObjects(obj[key])
+    }
+  }
+  return sum
+}
+
+// get all sums
+const getAllSums = (input) => {
+  const sumsArr = []
+  const calc = (input) => {
+    for (let key in input) {
+      if (typeof input[key] === 'object') {
+        sumsArr.push(sumNumbersInObjects(input[key]))
+        calc(input[key])
+      }
+    }
+    return sumsArr
+  }
+  return calc(input)
+}
+
 /**
  * Part 1
  */
-export const part1 = (input: TInput = format('input')) => {
-  // get sums of each values in object and nested obj
-  const sumNumbersInObjects = (obj): number => {
-    let sum = 0
-    for (const key in obj) {
-      if (typeof obj[key] === 'number') {
-        sum += obj[key]
-      } else if (typeof obj[key] === 'object') {
-        sum += sumNumbersInObjects(obj[key])
-      }
-    }
-    return sum
-  }
-
-  // call et sums
-  const getAllSums = (input) => {
-    const sums = {}
-    const sumsArr = []
-    const calc = (input) => {
-      for (let key in input) {
-        if (typeof input[key] === 'object') {
-          sums[key] = sumNumbersInObjects(input[key])
-          sumsArr.push(sums[key])
-          calc(input[key])
-        }
-      }
-      return sumsArr
-    }
-    return calc(input)
-  }
-
+export const part1 = (input: TInput = format('input.test')) => {
   return getAllSums(input)
     .filter((e) => e < 100000)
     .reduce((a, b) => a + b, 0)
@@ -154,4 +152,9 @@ export const part1 = (input: TInput = format('input')) => {
 /**
  * part2
  */
-export const part2 = (input: TInput = format('input.test')) => {}
+export const part2 = (input: TInput = format('input.test')) => {
+  const sums = getAllSums(input)
+  const bigger = sums.sort((a, b) => b - a)[0]
+  log('bigger', bigger)
+  return sums.filter((e) => 70000000 - e >= 30000000).sort((a, b) => b - a)
+}

@@ -5,6 +5,7 @@
 
 import fs from 'fs'
 import path from 'path'
+import { type } from 'os'
 const { log, clear } = console
 
 export type TInput = any
@@ -50,7 +51,7 @@ export const format = (filename: 'input.test' | 'input'): TInput => {
 
   const FINAL = {}
 
-  const read = (lines = browse, tree = FINAL, path = '') => {
+  const read = (lines = browse, tree = FINAL, path = []) => {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]
 
@@ -60,22 +61,25 @@ export const format = (filename: 'input.test' | 'input'): TInput => {
           if (line.split(' ')[2] === '/') {
             Object.assign(tree, { '/': {} })
             lines.shift()
-            return read(lines, tree['/'], path + '/')
+            path.push('/')
+            return read(lines, tree['/'], path)
           }
           // "$ cd .." is back, return parent object from path
           else if (line.split(' ')[2] === '..') {
             lines.shift()
-            const parentPath = path.slice(0, path.length - 1)
-            const parentPathArr = parentPath.split('')
+            path.pop()
             let parentTree = FINAL
-            for (let entry of parentPathArr) parentTree = parentTree[entry]
-            return read(lines, parentTree, parentPath)
+            for (let entry of path) {
+              parentTree = parentTree[entry]
+            }
+            return read(lines, parentTree, path)
           }
           // Enter in folder ex: "cd a"
           else {
             const key = line.split(' ')[2]
             lines.shift()
-            return read(lines, tree[key], path + key)
+            path.push(key)
+            return read(lines, tree[key], path)
           }
         }
         // Juste show
@@ -91,7 +95,6 @@ export const format = (filename: 'input.test' | 'input'): TInput => {
         lines.shift()
         return read(lines, tree, path)
       }
-
       // read: Number (is the file size
       else if (typeof parseInt(line.split(' ')[0]) === 'number') {
         lines.shift()
@@ -106,34 +109,46 @@ export const format = (filename: 'input.test' | 'input'): TInput => {
     }
     return FINAL
   }
-
-  const tree = read()
-  return tree
-}
-
-const flatDirectories = (input) => {
-  const FINAL = []
-  const parser = (entries) => {
-    for (let entry of Object.keys(entries)) {
-//      log('entry',entry)
-      // if (typeof entry === 'object') {
-      //   log('entry', entry)
-      // }
-    }
-  }
-  parser(input)
+  return read()
 }
 
 /**
  * Part 1
  */
-export const part1 = (input: TInput = format('input.test')) => {
-  log(input)
-  const bla = flatDirectories(input)
+export const part1 = (input: TInput = format('input')) => {
+  // get sums of each values in object and nested obj
+  const sumNumbersInObjects = (obj): number => {
+    let sum = 0
+    for (const key in obj) {
+      if (typeof obj[key] === 'number') {
+        sum += obj[key]
+      } else if (typeof obj[key] === 'object') {
+        sum += sumNumbersInObjects(obj[key])
+      }
+    }
+    return sum
+  }
 
-  // check dans
+  // call et sums
+  const getAllSums = (input) => {
+    const sums = {}
+    const sumsArr = []
+    const calc = (input) => {
+      for (let key in input) {
+        if (typeof input[key] === 'object') {
+          sums[key] = sumNumbersInObjects(input[key])
+          sumsArr.push(sums[key])
+          calc(input[key])
+        }
+      }
+      return sumsArr
+    }
+    return calc(input)
+  }
 
-  //  return input
+  return getAllSums(input)
+    .filter((e) => e < 100000)
+    .reduce((a, b) => a + b, 0)
 }
 
 /**

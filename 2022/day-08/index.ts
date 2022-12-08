@@ -31,7 +31,7 @@ export const format = (filename: 'input.test' | 'input'): TInput =>
  * Part 1
  */
 // prettier-ignore
-export const part1 = (input: TInput = format('input.test')) => {
+export const part1 = (input = format('input.test')): number => {
   let visible = 0
   for (let y = 0; y < input.length; y++)
     for (let x = 0; x < input[y].length; x++)
@@ -47,41 +47,37 @@ export const part1 = (input: TInput = format('input.test')) => {
 /**
  * part2
  */
-export const part2 = (input: TInput = format('input.test')) => {
-  let scores = []
+// prettier-ignore
+export const part2 = (input = format('input.test')): number => {
+  const scores = []
 
-  for (let y = 0; y < input.length; y++) {
-    const row = input[y]
+  for (let y = 0; y < input.length; y++)
+    for (let x = 0; x < input[y].length; x++) {
+      let counts = [0, 0, 0, 0]
 
-    for (let x = 0; x < row.length; x++) {
-      let treeValue = row[x]
-
-      const lefts = row.slice(0, x)
-      const leftsAreSmaller = lefts.every((e) => e < treeValue)
-      //log({ treeValue, lefts, leftsAreSmaller })
-
-      const rights = row.slice(x + 1)
-      const rightsAreSmaller = rights.every((e) => e < treeValue)
-      //log({ treeValue, rights, rightsAreSmaller })
-
-      const geColumn = (i) => input.map((e) => e[i])
-
-      const tops = geColumn(x).slice(0, y)
-      const topsAreSmaller = tops.every((e) => e < treeValue)
-      // y === 1 && log({ treeValue, tops, topsAreSmaller })
-
-      const bottoms = geColumn(x).slice(y + 1)
-      const bottomsAreSmaller = bottoms.every((e) => e < treeValue)
-      //log({ treeValue, bottoms, bottomsAreSmaller })
-
-      if (
-        leftsAreSmaller ||
-        rightsAreSmaller ||
-        topsAreSmaller ||
-        bottomsAreSmaller
-      ) {
+      const lefts = input[y].slice(0, x).reverse()
+      for (let i = 0; i < lefts.length; i++) {
+        counts[0]++
+        if (lefts[i] >= input[y][x]) break
       }
-      // scores.p
+      const rights = input[y].slice(x + 1)
+      for (let i = 0; i < rights.length; i++) {
+        counts[1]++
+        if (rights[i] >= input[y][x]) break
+      }
+      const tops = input.map((e) => e[x]).slice(0, y).reverse()
+      for (let i = 0; i < tops.length; i++) {
+        counts[2]++
+        if (tops[i] >= input[y][x]) break
+      }
+      const bottoms = input.map((e) => e[x]).slice(y + 1)
+      for (let i = 0; i < bottoms.length; i++) {
+        counts[3]++
+        if (bottoms[i] >= input[y][x]) break
+      }
+
+      scores.push(counts.reduce((a, b) => a * b))
     }
-  }
+
+  return scores.reduce((a, b) => (b > a ? b : a))
 }

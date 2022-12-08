@@ -1,11 +1,9 @@
 import { part1, part2 } from './index'
 
 it('resolve part 1', () => {
-  console.log(part1())
-  // expect(part1()).toBe( )
+  expect(part1()).toBe(21)
 })
 
 it('resolve part 2', () => {
-  // log(part2())
-  //expect(part2()).toBe( )
+  expect(part2()).toBe(8)
 })

@@ -88,7 +88,7 @@ export const format = (filename: 'input.test' | 'input'): TInput => {
           return read(lines, tree, path)
         }
       }
-      // read: dir (restart on this recursively)
+      // read: dir
       else if (line.split(' ')[0] === 'dir') {
         const key = line.split(' ')[1]
         Object.assign(tree, { [key]: {} })
@@ -152,9 +152,8 @@ export const part1 = (input: TInput = format('input.test')) => {
 /**
  * part2
  */
-export const part2 = (input: TInput = format('input')) => {
+export const part2 = (input: TInput = format('input.test')) => {
   const sums = getAllSums(input)
-  // const bigger = sums.sort((a, b) => b - a)[0]
-  // log('bigger', bigger)
-  return sums.filter((e) => 70000000 - e >= 30000000).sort((a, b) => b - a)[0]
+  const free = 70000000 - sums.sort((a, b) => b - a)[0]
+  return sums.filter((e) => e + free >= 30000000).sort((a, b) => a - b)[0]
 }

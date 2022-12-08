@@ -30,8 +30,25 @@ export const format = (filename: 'input.test' | 'input'): TInput =>
 /**
  * Part 1
  */
-export const part1 = (input: TInput = format('input')) => {
+// prettier-ignore
+export const part1 = (input: TInput = format('input.test')) => {
   let visible = 0
+  for (let y = 0; y < input.length; y++)
+    for (let x = 0; x < input[y].length; x++)
+      if (
+        input[y].slice(0, x).every((e) => e < input[y][x]) ||
+        input[y].slice(x + 1).every((e) => e < input[y][x]) ||
+        input.map((e) => e[x]).slice(0, y).every((e) => e < input[y][x]) ||
+        input.map((e) => e[x]).slice(y + 1).every((e) => e < input[y][x])
+      ) visible++
+  return visible
+}
+
+/**
+ * part2
+ */
+export const part2 = (input: TInput = format('input.test')) => {
+  let scores = []
 
   for (let y = 0; y < input.length; y++) {
     const row = input[y]
@@ -63,19 +80,8 @@ export const part1 = (input: TInput = format('input')) => {
         topsAreSmaller ||
         bottomsAreSmaller
       ) {
-        visible++
       }
-
-      // OU si tous les autres TOP sont plus petit
-      // OU si tous les autres RIGHT  sont plus petit
-      // OU si tous les autres BOTTOM  sont plus petit
+      // scores.p
     }
   }
-
-  return visible
 }
-
-/**
- * part2
- */
-export const part2 = (input: TInput = format('input.test')) => {}

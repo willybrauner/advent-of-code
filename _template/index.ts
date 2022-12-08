@@ -5,6 +5,7 @@
 
 import fs from 'fs'
 import path from 'path'
+const { log } = console
 
 export type TInput = any
 

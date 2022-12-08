@@ -5,6 +5,7 @@
 
 import fs from 'fs'
 import path from 'path'
+import { getColumns } from '../../2021/day-03'
 const { log } = console
 
 export type TInput = any
@@ -29,51 +30,49 @@ export const format = (filename: 'input.test' | 'input'): TInput =>
 /**
  * Part 1
  */
-export const part1 = (input: TInput = format('input.test')) => {
+export const part1 = (input: TInput = format('input')) => {
   let visible = 0
 
   for (let y = 0; y < input.length; y++) {
     const row = input[y]
 
-    for (let x = 0; x < input[y].length; x++) {
-      // TODO on veut pas tester les arbres qui se trouvent au bord du graph
-      // voir si ça marche bien
-      if (x === 0 || x === input[y][input[y].length - 1]) continue
+    for (let x = 0; x < row.length; x++) {
+      let treeValue = row[x]
 
-      let treeValue = input[y][x]
-      const bigTreeRow: { value: number; index: number } = row.reduce(
-        (a, b, i) => (a.value >= b ? a : { value: b, index: i }),
-        { value: 0, index: 0 }
-      )
+      const lefts = row.slice(0, x)
+      const leftsAreSmaller = lefts.every((e) => e < treeValue)
+      //log({ treeValue, lefts, leftsAreSmaller })
 
-      if (y === 1) {
-        log('---------------------------------------')
-        log('current', { value: treeValue, index: x })
-        log('bigTreeRow', bigTreeRow)
+      const rights = row.slice(x + 1)
+      const rightsAreSmaller = rights.every((e) => e < treeValue)
+      //log({ treeValue, rights, rightsAreSmaller })
+
+      const geColumn = (i) => input.map((e) => e[i])
+
+      const tops = geColumn(x).slice(0, y)
+      const topsAreSmaller = tops.every((e) => e < treeValue)
+      // y === 1 && log({ treeValue, tops, topsAreSmaller })
+
+      const bottoms = geColumn(x).slice(y + 1)
+      const bottomsAreSmaller = bottoms.every((e) => e < treeValue)
+      //log({ treeValue, bottoms, bottomsAreSmaller })
+
+      if (
+        leftsAreSmaller ||
+        rightsAreSmaller ||
+        topsAreSmaller ||
+        bottomsAreSmaller
+      ) {
+        visible++
       }
 
-      // si le current est plus grand que le bigger
-      // TODO revoir cette condition
-      if (x <= bigTreeRow.index && treeValue >= bigTreeRow.value) {
-        log('visible on LEFT', treeValue, { y, x })
-      }
-
-      // et son index de row est supérieur, (il est positionné a droite)
-      // c'est qu'on ne peut pas le voir depuis RIGHT
-
-      // sur une COLUMN,
-      // si un tree est plus grand que le courant
-      // et son index de row est inférieur, (il est positionné en haut)
-      // c'est qu'on ne peut pas le voir depuis TOP
-
-      // et son index de row est supérieur, (il est positionné a droite)
-      // c'est qu'on ne peut pas le voir depuis BOTTOM
-
-      //return
+      // OU si tous les autres TOP sont plus petit
+      // OU si tous les autres RIGHT  sont plus petit
+      // OU si tous les autres BOTTOM  sont plus petit
     }
   }
 
-  return input
+  return visible
 }
 
 /**

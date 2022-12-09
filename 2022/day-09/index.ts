@@ -24,40 +24,47 @@ export const format = (filename: 'input.test' | 'input'): TInput =>
  */
 export const part1 = (input: TInput) => {
   const T = [{ x: 0, y: 0 }]
+  let prevH: { x: number; y: number }
   let H = { x: 0, y: 0 }
 
   for (let i = 0; i < input.length; i++) {
-     if (i > 3) return
     const [dir, move] = input[i]
-    log('-'.repeat(20))
-    log({ dir, move })
-    log('-'.repeat(20))
-
-    for (let m = 0; m < move; m++)
-    {
-      const isLastMove = m === move - 1
-      if (dir == 'R') {
-        H = { x: H.x + 1, y: H.y }
+    for (let m = 0; m < move; m++) {
+      prevH = H
+      if (dir == 'R') H = { x: H.x + 1, y: H.y }
+      if (dir == 'U') H = { x: H.x, y: H.y - 1 }
+      if (dir == 'L') H = { x: H.x - 1, y: H.y }
+      if (dir == 'D') H = { x: H.x, y: H.y + 1 }
+      if (
+        ![
+          [0, 0],
+          [0, -1],
+          [1, -1],
+          [1, 0],
+          [1, 1],
+          [0, 1],
+          [-1, 1],
+          [-1, 0],
+          [-1, -1],
+        ].some(
+          (e) =>
+            JSON.stringify({
+              x: T[T.length - 1].x + e[0],
+              y: T[T.length - 1].y + e[1],
+            }) === JSON.stringify(H)
+        )
+      ) {
+        T.push(prevH)
       }
-      if (dir == 'U') {
-        H = { x: H.x, y: H.y - 1 }
-      }
-      if (dir == 'L') {
-        H = { x: H.x - 1, y: H.y }
-      }
-      if (dir == 'D') {
-        H = { x: H.x, y: H.y + 1 }
-      }
-      if (!isLastMove) T.push(H)
     }
-
-    log({ T, lastH: H })
   }
 
-  log(new Set(T).size)
-  return input
+  return T.reduce(
+    (a, b) => (!a.some((e) => b.x === e.x && b.y === e.y) ? [...a, b] : a),
+    []
+  ).length
 }
-part1(format('input.test'))
+part1(format('input.test')) // 13
 
 /**
  * part2

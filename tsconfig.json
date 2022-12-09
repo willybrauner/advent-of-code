@@ -2,7 +2,7 @@
   "compilerOptions": {
     "strict": false,
     "composite": false,
-    "module": "esNext",
+    "module": "commonjs",
     "target": "esNext",
     "moduleResolution": "node",
     "types": ["node", "jest"],

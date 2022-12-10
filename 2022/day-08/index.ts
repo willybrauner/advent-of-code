@@ -5,7 +5,6 @@
 
 import fs from 'fs'
 import path from 'path'
-import { getColumns } from '../../2021/day-03'
 const { log } = console
 
 export type TInput = any

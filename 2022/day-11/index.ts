@@ -13,6 +13,7 @@ export type TMonkey = {
   startingItems: number[]
   operation: (x) => number
   isDivisible: (x) => boolean
+  divisible: number
   throwTo: (x) => number
   inspected: number
 }
@@ -38,6 +39,7 @@ export const format = (filename: 'input.test' | 'input'): TInput => {
       startingItems: null,
       operation: null,
       isDivisible: null,
+      divisible: null,
       throwTo: null,
       inspected: 0,
     }
@@ -67,12 +69,8 @@ export const format = (filename: 'input.test' | 'input'): TInput => {
         }
         if (i === 3) {
           const [test, isTrue, isFalse] = line.split('/')
-
-          obj.isDivisible = (x): boolean =>
-            Number.isInteger(
-              x / parseInt(test.split(' ')[test.split(' ').length - 1])
-            )
-
+          obj.divisible = parseInt(test.split(' ')[test.split(' ').length - 1])
+          obj.isDivisible = (x): boolean => Number.isInteger(x / obj.divisible)
           obj.throwTo = (isDivisible: boolean) =>
             parseInt(
               isDivisible
@@ -88,64 +86,47 @@ export const format = (filename: 'input.test' | 'input'): TInput => {
   return monkeys.map((e) => formatMonkey(e))
 }
 
-const inspectMonkey = (
-  monkey: TMonkey,
+const resolver = (
   monkeys: TMonkey[],
-  worryDivided = 3
-): void => {
-  // log('monkey', monkey)
-  monkey.startingItems?.forEach((startingItem, i) => {
-    monkey.inspected++
-    const worry = Math.floor(monkey.operation(startingItem) / worryDivided)
-    const trowTo = monkey.throwTo(monkey.isDivisible(worry))
-    monkeys[trowTo].startingItems.push(worry)
+  rounds = 20,
+  magicFn: (a: number) => number
+) => {
+  for (let i = 0; i < rounds; i++) {
+    for (let m = 0; m < monkeys.length; m++) {
+      const monkey = monkeys[m]
+      monkey.startingItems?.forEach((startingItem, i) => {
+        monkey.inspected++
+        const worry = magicFn(monkey.operation(startingItem))
+        const trowTo = monkey.throwTo(monkey.isDivisible(worry))
+        monkeys[trowTo].startingItems.push(worry)
+      })
+      // clear!
+      monkey.startingItems = []
+    }
+  }
 
-    // log('---------')
-    // log('monkey.startingItems', monkey.startingItems)
-    // log('startingItem', startingItem)
-    // log('worry', worry)
-    // log('trowTo', trowTo)
-    // log('---------')
-    //log('monkeys', monkeys)
-  })
-
-  // clear
-  monkey.startingItems = []
+  return monkeys
+    .sort((a, b) => b.inspected - a.inspected)
+    .splice(0, 2)
+    .reduce((a, b) => a * b.inspected, 1)
 }
 
 /**
  * Part 1
  */
-export const part1 = (input: TInput) => {
-  for (let i = 0; i < 20; i++)
-    for (let m = 0; m < input.length; m++) {
-      inspectMonkey(input[m], input)
-    }
-
-  return input
-    .sort((a, b) => b.inspected - a.inspected)
-    .splice(0, 2)
-    .reduce((a, b) => a * b.inspected, 1)
-}
+export const part1 = (input: TInput) =>
+  resolver(input, 20, (e) => Math.floor(e / 3))
 
 log(part1(format('input.test')))
 
 /**
  * part2
  */
-export const part2 = (input: TInput) => {
-  for (let i = 0; i < 1; i++)
-    for (let m = 0; m < input.length; m++) {
-      inspectMonkey(input[m], input, 1)
-    }
-
-
-  const selected = input
-   // .sort((a, b) => b.inspected - a.inspected)
-   // .splice(0, 2)
-
-  //selected.reduce((a, b) => a * b.inspected, 1)
-  return selected
-}
+export const part2 = (input: TInput) =>
+  resolver(
+    input,
+    10000,
+    (a) => a % input.map((m) => m.divisible).reduce((a, b) => a * b)
+  )
 
 log(part2(format('input.test')))

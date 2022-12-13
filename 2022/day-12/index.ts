@@ -19,7 +19,7 @@ export const format = (filename: 'input.test' | 'input'): TInput =>
     .map((e) =>
       e.split('').map((e) => {
         if (e === 'S') return 0
-        if (e === 'E') return 27
+        if (e === 'E') return 26
         return e.charCodeAt(0) - 96
       })
     )
@@ -27,8 +27,7 @@ export const format = (filename: 'input.test' | 'input'): TInput =>
 /**
  * Part 1
  */
-export const part1 = (input: TInput) =>
-{
+export const part1 = (input: TInput) => {
   const getVertexPositionByCost = (input, cost): [number, number] => {
     for (let y = 0; y < input.length; y++)
       for (let x = 0; x < input[y].length; x++)
@@ -53,10 +52,9 @@ export const part1 = (input: TInput) =>
 
   const getCostBetweenVertices = (_, [y2, x2]) => 1
 
-  log('getVertexPositionByCost(input, 27)', getVertexPositionByCost(input, 27))
-  log('getVertexPositionByCost(input, 0)', getVertexPositionByCost(input, 0))
+
   const isTarget = (vertex) =>
-    vertex.every((coord, i) => coord === getVertexPositionByCost(input, 27)[i])
+    vertex.every((coord, i) => coord === getVertexPositionByCost(input, 26)[i])
 
   const { finalCost } = dijkstra<[number, number]>(
     getNeighbors,
@@ -67,7 +65,7 @@ export const part1 = (input: TInput) =>
 
   return finalCost
 }
-log(part1(format('input')))
+log(part1(format('input.test')))
 
 /**
  * part2

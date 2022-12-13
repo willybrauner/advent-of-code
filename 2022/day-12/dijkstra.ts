@@ -26,7 +26,8 @@ export function dijkstra<GVertex>(
   while (!queue.isEmpty()) {
     count++
     const shortestVertex = queue.dequeue()
-    const currentVertex = shortestVertex.key
+    const currentVertex = shortestVertex?.key
+    if (!currentVertex) return {}
     const neighborVertices = getNeighbors(currentVertex)
 
     if (isTarget(currentVertex)) {

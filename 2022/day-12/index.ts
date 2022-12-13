@@ -24,16 +24,18 @@ export const format = (filename: 'input.test' | 'input'): TInput =>
       })
     )
 
-/**
- * Part 1
- */
-export const part1 = (input: TInput) => {
-  const getVertexPositionByCost = (input, cost): [number, number] => {
-    for (let y = 0; y < input.length; y++)
-      for (let x = 0; x < input[y].length; x++)
-        if (input[y][x] === cost) return [y, x]
-  }
+const getVertexPositionByCost = (input, cost): [number, number][] => {
+  const pos = []
+  for (let y = 0; y < input.length; y++)
+    for (let x = 0; x < input[y].length; x++)
+      if (input[y][x] === cost) pos.push([y, x])
+  return pos
+}
 
+const processDijkstra = (
+  input: TInput,
+  startVec2: [number, number]
+): number => {
   const getNeighbors = ([y, x]) => {
     return [
       [y + 1, x],
@@ -50,27 +52,46 @@ export const part1 = (input: TInput) => {
     }, [])
   }
 
-  const getCostBetweenVertices = (_, [y2, x2]) => 1
-
+  const getCostBetweenVertices = () => 1
 
   const isTarget = (vertex) =>
-    vertex.every((coord, i) => coord === getVertexPositionByCost(input, 26)[i])
+    vertex.every(
+      (coord, i) => coord === getVertexPositionByCost(input, 26)[0][i]
+    )
 
   const { finalCost } = dijkstra<[number, number]>(
     getNeighbors,
     getCostBetweenVertices,
-    getVertexPositionByCost(input, 0),
+    startVec2,
     isTarget
   )
 
   return finalCost
 }
-log(part1(format('input.test')))
+
+/**
+ * Part 1
+ */
+export const part1 = (input: TInput) => {
+  return processDijkstra(input, getVertexPositionByCost(input, 0)[0])
+}
+log(part1(format('input')))
 
 /**
  * part2
  */
 export const part2 = (input: TInput) => {
-  return input
+  const starts = [
+    // start position
+    ...getVertexPositionByCost(input, 0),
+    ...getVertexPositionByCost(input, 1),
+  ]
+
+  const costs = []
+  for (let start of starts) {
+    costs.push(processDijkstra(input, start))
+  }
+
+  return costs.sort((a, b) => a - b)[0]
 }
-part2(format('input.test'))
+log(part2(format('input')))

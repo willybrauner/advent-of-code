@@ -27,10 +27,8 @@ export const format = (filename: 'input.test' | 'input'): TInput =>
 /**
  * Part 1
  */
-export const part1 = (input: TInput) => {
-  //  log(input)
-  // log(input.map((e) => e.toString()))
-
+export const part1 = (input: TInput) =>
+{
   const getVertexPositionByCost = (input, cost): [number, number] => {
     for (let y = 0; y < input.length; y++)
       for (let x = 0; x < input[y].length; x++)
@@ -45,10 +43,7 @@ export const part1 = (input: TInput) => {
       [y, x - 1],
     ].reduce((a, [pY, pX], i) => {
       const currentNeighbor = input?.[pY]?.[pX]
-      if (
-        currentNeighbor === input[y][x] ||
-        currentNeighbor === input[y][x] + 1
-      ) {
+      if (currentNeighbor <= input[y][x] + 1) {
         return [...a, ...[[pY, pX]]]
       } else {
         return a
@@ -58,10 +53,10 @@ export const part1 = (input: TInput) => {
 
   const getCostBetweenVertices = (_, [y2, x2]) => 1
 
-  log('getVertexPositionByCost(input, 26)', getVertexPositionByCost(input, 26))
+  log('getVertexPositionByCost(input, 27)', getVertexPositionByCost(input, 27))
   log('getVertexPositionByCost(input, 0)', getVertexPositionByCost(input, 0))
   const isTarget = (vertex) =>
-    vertex.every((coord, i) => coord === getVertexPositionByCost(input, 26)[i])
+    vertex.every((coord, i) => coord === getVertexPositionByCost(input, 27)[i])
 
   const { finalCost } = dijkstra<[number, number]>(
     getNeighbors,
@@ -72,7 +67,7 @@ export const part1 = (input: TInput) => {
 
   return finalCost
 }
-log(part1(format('input.test')))
+log(part1(format('input')))
 
 /**
  * part2

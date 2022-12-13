@@ -19,7 +19,7 @@ export const format = (filename: 'input.test' | 'input'): TInput =>
     .map((e) =>
       e.split('').map((e) => {
         if (e === 'S') return 0
-        if (e === 'E') return 26
+        if (e === 'E') return 27
         return e.charCodeAt(0) - 96
       })
     )
@@ -30,34 +30,49 @@ export const format = (filename: 'input.test' | 'input'): TInput =>
 export const part1 = (input: TInput) => {
   //  log(input)
   // log(input.map((e) => e.toString()))
-  const getNeighbors = ([y, x]) =>
-    [
-      [y - 1, x],
+
+  const getVertexPositionByCost = (input, cost): [number, number] => {
+    for (let y = 0; y < input.length; y++)
+      for (let x = 0; x < input[y].length; x++)
+        if (input[y][x] === cost) return [y, x]
+  }
+
+  const getNeighbors = ([y, x]) => {
+    return [
       [y + 1, x],
       [y, x + 1],
+      [y - 1, x],
       [y, x - 1],
-    ].reduce(
-      (a, [pY, pX]) => [...a, ...(input?.[pY]?.[pX] ? [[pY, pX]] : [])],
-      []
-    )
+    ].reduce((a, [pY, pX], i) => {
+      const currentNeighbor = input?.[pY]?.[pX]
+      if (
+        currentNeighbor === input[y][x] ||
+        currentNeighbor === input[y][x] + 1
+      ) {
+        return [...a, ...[[pY, pX]]]
+      } else {
+        return a
+      }
+    }, [])
+  }
 
-  const getCostBetweenVertices = (_, [y2, x2]) => input[y2][x2]
+  const getCostBetweenVertices = (_, [y2, x2]) => 1
 
-  const isTarget = (vertex) => vertex.every((coord, i) => coord === [2, 5][i])
+  log('getVertexPositionByCost(input, 26)', getVertexPositionByCost(input, 26))
+  log('getVertexPositionByCost(input, 0)', getVertexPositionByCost(input, 0))
+  const isTarget = (vertex) =>
+    vertex.every((coord, i) => coord === getVertexPositionByCost(input, 26)[i])
 
-  const { count, distances } = dijkstra<[number, number]>(
+  const { finalCost } = dijkstra<[number, number]>(
     getNeighbors,
     getCostBetweenVertices,
-    [0, 0],
+    getVertexPositionByCost(input, 0),
     isTarget
   )
 
-  //  log(distances)
-  log(count, Object.keys(distances).length)
-
-  return input
+  return finalCost
 }
-part1(format('input.test'))
+log(part1(format('input.test')))
 
 /**
  * part2

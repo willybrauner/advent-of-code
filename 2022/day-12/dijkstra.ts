@@ -35,8 +35,8 @@ export function dijkstra<GVertex>(
     }
 
     for (const v of neighborVertices) {
-      const newDistance =
-        distances[`${currentVertex}`] + getCostBetweenVertices(currentVertex, v)
+      const costBetweenVertices = getCostBetweenVertices(currentVertex, v)
+      const newDistance = distances[`${currentVertex}`] + costBetweenVertices
 
       if (newDistance < (distances[`${v}`] || Infinity)) {
         distances[`${v}`] = newDistance

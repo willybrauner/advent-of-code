@@ -4,12 +4,12 @@
  */
 import fs from 'fs'
 import path from 'path'
-import retryTimes = jest.retryTimes
+import * as trace_events from 'trace_events'
 const { log, clear } = console
 clear()
 
-type Side = number[]
-type Pair = Side[]
+type Side = [any, any]
+type Pair = any
 type Input = [Pair, Pair]
 
 const format = (filename: 'input.test' | 'input'): Input =>
@@ -24,6 +24,8 @@ const format = (filename: 'input.test' | 'input'): Input =>
         .map((e) => eval(e))
     ) as Input
 
+
+// util
 const arraysAreEqual = (a, b): boolean => {
   if (a.length !== b.length) return false
   for (let i = 0; i < a.length; i++) {
@@ -33,21 +35,53 @@ const arraysAreEqual = (a, b): boolean => {
 }
 
 // prettier-ignore
-const compare = ([L, R]: Pair): boolean | undefined => {
+const comparison = ([L, R]:Pair): boolean | undefined => {
+  // check if params are arrays
   const arrL: boolean = Array.isArray(L)
   const arrR: boolean = Array.isArray(R)
-  // Do comparison
-  if (arrL && arrR)
-    if (arraysAreEqual(L, R)) return true
-    if (L.length === 0) return
-    if (R.length === 0) return true
 
-  else if (arrL && !arrR) {}
-  else if (!arrL && arrR) {}
+  // if both arr arrays
+  if (arrL && arrR) {
+
+    // if arrays arr equal, stop here
+    if (arraysAreEqual(L, R)) return null
+    // else, if L as no length, he is smaller for sure,
+    else if (L.length === 0) return true
+    // else if L > R return false
+    else if (R.length === 0) return false
+
+      // create copy of L and R to not modify there reference
+      const copyL= [...L]
+      const copyR = [...R]
+
+      // restart comparison
+      let compare = comparison([copyL[0], copyR[0]]);
+
+      // until compare will be null,
+      // remove first item of each side L and R,
+      // test them and re compare next first item
+      while (compare === null) {
+        copyL.shift()
+        copyR.shift()
+        if (copyL.length === 0) return true
+        if (copyR.length === 0) return false
+        compare = comparison([copyL[0], copyR[0]])
+      }
+      return compare
+  }
+
+  // case one side is an array, and the other is a number
+  // we have to compare have same type on each side,
+  // the trick is to transform number to array who will be check bellow
+  // on the comparison
+  else if (arrL && !arrR) return comparison([L, [R]])
+  else if (!arrL && arrR) return comparison([[L], R])
+
+  // If L and R are number
   else {
-    if (L < R) {}
-    else if (L > R) {}
-    else return
+    if (L < R) return true
+    else if (L > R) return false
+    else return null
   }
 }
 
@@ -57,12 +91,12 @@ const compare = ([L, R]: Pair): boolean | undefined => {
 const part1 = (input: Input) => {
   let count = 0
   for (let i = 0; i < input.length; i++) {
-    const isInOrder = compare(input[i])
+    const isInOrder = comparison(input[i])
     if (isInOrder) count += i + 1
   }
   return count
 }
-log(part1(format('input.test')))
+log(part1(format('input')))
 
 /**
  * part2

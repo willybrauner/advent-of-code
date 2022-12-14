@@ -25,15 +25,20 @@ const format = (filename: 'input.test' | 'input'): Input =>
 
 // util
 const arraysAreEqual = (a, b): boolean => {
+  if (a == null || b == null) return false
   if (a.length !== b.length) return false
-  for (let i = 0; i < a.length; i++) {
-    if (a[i] !== b[i]) return false
-  }
+  for (let i = 0; i < a.length; ++i) if (a[i] !== b[i]) return false
   return true
 }
 
 // prettier-ignore
-const comparison = ([L, R]:Pair): boolean | undefined => {
+const comparison = ([L, R]:Pair): boolean | undefined =>
+{
+  if (Number.isInteger(L) && Number.isInteger(R))
+    if (L < R) return true
+    else if (L > R) return false
+    else return null
+
   // check if params are arrays
   const arrL: boolean = Array.isArray(L)
   const arrR: boolean = Array.isArray(R)
@@ -43,7 +48,7 @@ const comparison = ([L, R]:Pair): boolean | undefined => {
 
     // if arrays arr equal, stop here
     if (arraysAreEqual(L, R)) return null
-    // else, if L as no length, he is smaller for sure,
+    // else, if L as no length, he is smaller for sure, return true
     else if (L.length === 0) return true
     // else if L > R return false
     else if (R.length === 0) return false
@@ -52,7 +57,7 @@ const comparison = ([L, R]:Pair): boolean | undefined => {
       const copyL= [...L]
       const copyR = [...R]
 
-      // restart comparison
+      // restart comparison with first copy arrays item
       let compare = comparison([copyL[0], copyR[0]]);
 
       // Until comparison will be null,
@@ -75,12 +80,6 @@ const comparison = ([L, R]:Pair): boolean | undefined => {
   else if (arrL && !arrR) return comparison([L, [R]])
   else if (!arrL && arrR) return comparison([[L], R])
 
-  // If L and R are number
-  else {
-    if (L < R) return true
-    else if (L > R) return false
-    else return null
-  }
 }
 
 /**
@@ -94,7 +93,7 @@ const part1 = (input: Input) => {
   }
   return count
 }
-log(part1(format('input.test')))
+log(part1(format('input')))
 
 /**
  * part2
@@ -110,4 +109,4 @@ const part2 = (input: Input) => {
   return (flatArr.indexOf(two) + 1) * (flatArr.indexOf(six) + 1)
 }
 
-log(part2(format('input.test')))
+log(part2(format('input')))

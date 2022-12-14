@@ -32,12 +32,14 @@ const arraysAreEqual = (a, b): boolean => {
 }
 
 // prettier-ignore
-const comparison = ([L, R]:Pair): boolean | undefined =>
+const comparison = ([L, R]: Pair): boolean | undefined =>
 {
+  // in case L and R are number,
+  // check witch one is
   if (Number.isInteger(L) && Number.isInteger(R))
     if (L < R) return true
     else if (L > R) return false
-    else return null
+    else if (L === R) return null
 
   // check if params are arrays
   const arrL: boolean = Array.isArray(L)

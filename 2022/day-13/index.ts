@@ -24,7 +24,6 @@ const format = (filename: 'input.test' | 'input'): Input =>
         .map((e) => eval(e))
     ) as Input
 
-
 // util
 const arraysAreEqual = (a, b): boolean => {
   if (a.length !== b.length) return false
@@ -96,12 +95,29 @@ const part1 = (input: Input) => {
   }
   return count
 }
-log(part1(format('input')))
 
 /**
  * part2
  */
 const part2 = (input: Input) => {
-  return input
+  let count = 0
+
+  // TODO doit prendre l'ordre
+  for (let i = 0; i < input.length; i++) {
+    const isInOrder = comparison(input[i])
+    const [L, R] = input[i]
+    if (isInOrder) count += i + 1
+  }
+
+  const two = [[2]]
+  const six = [[6]]
+  const flatArr = input
+    .reduce((a, [left, right]) => [...a, left, right], [])
+    .concat([two, six])
+    .sort()
+
+
+  return (flatArr.indexOf(two) + 1) * (flatArr.indexOf(six) + 1)
 }
-part2(format('input.test'))
+
+log(part2(format('input')))

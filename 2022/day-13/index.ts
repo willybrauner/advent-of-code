@@ -4,7 +4,6 @@
  */
 import fs from 'fs'
 import path from 'path'
-import * as trace_events from 'trace_events'
 const { log, clear } = console
 clear()
 
@@ -56,7 +55,7 @@ const comparison = ([L, R]:Pair): boolean | undefined => {
       // restart comparison
       let compare = comparison([copyL[0], copyR[0]]);
 
-      // until compare will be null,
+      // Until comparison will be null,
       // remove first item of each side L and R,
       // test them and re compare next first item
       while (compare === null) {
@@ -95,29 +94,20 @@ const part1 = (input: Input) => {
   }
   return count
 }
+log(part1(format('input.test')))
 
 /**
  * part2
  */
 const part2 = (input: Input) => {
-  let count = 0
-
-  // TODO doit prendre l'ordre
-  for (let i = 0; i < input.length; i++) {
-    const isInOrder = comparison(input[i])
-    const [L, R] = input[i]
-    if (isInOrder) count += i + 1
-  }
-
   const two = [[2]]
   const six = [[6]]
   const flatArr = input
     .reduce((a, [left, right]) => [...a, left, right], [])
     .concat([two, six])
     .sort()
-
-
+    .sort((left, right) => (comparison([right, left]) ? 1 : -1))
   return (flatArr.indexOf(two) + 1) * (flatArr.indexOf(six) + 1)
 }
 
-log(part2(format('input')))
+log(part2(format('input.test')))

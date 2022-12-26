@@ -1,6 +1,6 @@
 /**
  * 2022 - Day 17
- *  https://adventofcode.com/2022/day/17
+ * https://adventofcode.com/2022/day/17
  */
 
 import fs from 'fs'
@@ -36,7 +36,7 @@ const rocks = [
     [2,-3],
     [2,-2],
     [2,-1],
-    [2,-0],
+    [2, 0],
   ],
   [
     [2,-1], [3,-1],
@@ -45,93 +45,75 @@ const rocks = [
 ]
 
 const getSmallestY = (a) => a.reduce((a, b) => (b[1] < a ? b[1] : a), a[0][1])
-const getBiggestY = (a) => a.reduce((a, b) => (b[1] > a ? b[1] : a), a[0][1])
 
-const updateY = (rock, y = 1, played) => {
+const updateY = (rock, y = 1) => {
   return rock.reduce((a, b) => [...a, [b[0], b[1] + y]], [])
 }
 
-const updateX = (rock, pattern, played) => {
+const updateX = (rock, pattern) => {
   const smallestX = rock.reduce((a, b) => (b[0] < a ? b[0] : a), rock[0][0])
-  const biggestX = rock.reduce((a, b) => (b[0] > a ? b[0] : a), 0)
+  const biggestX = rock.reduce((a, b) => (b[0] > a ? b[0] : a), rock[0][0])
   if (
     (pattern === '>' && biggestX === 6) ||
-    (pattern === '<' && smallestX === 0) ||
-    intersect(rock, played)
+    (pattern === '<' && smallestX === 0)
   )
     return rock
-  return rock.reduce(
-    (a, b, i) => [...a, [b[0] + (pattern == '>' ? +1 : -1), b[1]]],
-    []
-  )
+  else
+    return rock.reduce(
+      (a, b) => [...a, [b[0] + (pattern == '>' ? +1 : -1), b[1]]],
+      []
+    )
 }
 
-const intersect = (a: number[][], b: number[][]): boolean =>
-  a.some(([x, y]) =>
-    b.some(([bX, bY]) => bX === x && bY === y))
-
-// const intersect2 = (a: number[][], b: number[][]): boolean =>
-// {
-//
-//   for (let list1 of a)
-//   {
-//     for (let list2 of b)
-//     {
-//
-//     }
-//   }
-// }
+const intersect = (block: number[][], list: Set<number[]>): boolean => {
+  for (const vec2 of block)
+    for (const lVec2 of list.values())
+      if (vec2[0] === lVec2[0] && vec2[1] === lVec2[1]) return true
+  return false
+}
 
 /**
  * Part 1
  */
 export const part1 = (patterns: TInput) => {
-  const played: number[][] = [
-    [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0]
-  ]
-  let Y = 0
+
+  // start with ground
+  const played = new Set([
+    [0, 0],
+    [1, 0],
+    [2, 0],
+    [3, 0],
+    [4, 0],
+    [5, 0],
+    [6, 0],
+  ])
+
+  let tower = 0
+  let counter = 0
 
   for (let i = 0; i < 2022; i++) {
-    //if (i > 3) return
-
     const rock = rocks[i % rocks.length]
-    let current = rock
-    current = updateY(rock, Y - 3, played)
-    //log('current', current)
+    let current = updateY(rock, tower - 4)
 
-    //
     while (true) {
-      // log('pattern',pattern)
-      let pattern = patterns.shift()
-      //log('after update X', current)
-      current = updateX(current, pattern, played)
-      //log('after update Y', current)
-      current = updateY(current, 1, played)
+      let pattern = patterns[counter % patterns.length]
+      counter++
 
-      const canUpdateY = () => !(getSmallestY(current) === 0 || intersect(current, played))
-
-      // si pas de played
-      // si un dev vec intersect avec un des vec played
-      if (!canUpdateY())
-      {
-        if (getSmallestY(current) !== 0) current = updateY(current, -1, played)
-
-        // keep vec2s
-        for (let vec2 of current) played.push(vec2)
-
-        // log('played', played)
-        Y = Math.min(getSmallestY(current), Y)
-        log(Y)
+      if (!intersect(updateX(current, pattern), played)) {
+        current = updateX(current, pattern)
+      }
+      if (!intersect(updateY(current), played)) {
+        current = updateY(current, 1)
+      } else {
+        for (let vec2 of current) played.add(vec2)
+        tower = Math.min(getSmallestY(current), tower)
         break
       }
     }
   }
-
-  log('Y', Y)
-  return Y
+  return tower
 }
-
-log(part1(format('input.test')))
+log(part1(format('input')))
 
 /**
  * part2

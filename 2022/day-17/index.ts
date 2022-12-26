@@ -10,17 +10,6 @@ clear()
 
 export type TInput = string[]
 
-const chunksArr = (input, size) =>
-  input.reduce((a, b, i) => {
-    return i % size === 0
-      ? [...a, [b]]
-      : [...a.slice(0, -1), [...a.slice(-1)[0], b]]
-  })
-
-export const clamp = (min: number, value: number, max: number): number => {
-  return Math.max(min, Math.min(value, max))
-}
-
 export const format = (filename: 'input.test' | 'input'): TInput =>
   fs
     .readFileSync(path.resolve(__dirname, filename), 'utf8')
@@ -34,66 +23,115 @@ const rocks = [
     [2, 0],[3, 0],[4, 0],[5, 0]
   ],
   [
-           [3, 0],
-    [2, 1],[3, 1],[4, 1],
-           [3, 2]
+           [3,-2],
+    [2,-1],[3,-1],[4,-1],
+           [3, 0]
   ],
   [
-                  [4, 0],
-                  [4, 1],
-    [2, 2],[3, 2],[4, 2]
+                  [4,-2],
+                  [4,-1],
+    [2, 0],[3, 0],[4, 0]
   ],
   [
-    [2, 0],
-    [2, 1],
-    [2, 2],
-    [2, 3],
+    [2,-3],
+    [2,-2],
+    [2,-1],
+    [2,-0],
   ],
   [
+    [2,-1], [3,-1],
     [2, 0], [3, 0],
-    [2, 1], [3, 1],
   ],
 ]
 
+const getSmallestY = (a) => a.reduce((a, b) => (b[1] < a ? b[1] : a), a[0][1])
+const getBiggestY = (a) => a.reduce((a, b) => (b[1] > a ? b[1] : a), a[0][1])
 
-const updateY = (rock) => rock.reduce((a, b) => [...a, [b[0], b[1]+1]], [])
-// prettier-ignore
-const updateX = (rock, pattern) => {
-  const smallestX = rock.reduce((a, b) => (b[0] < a ? b[0] : a), rock[0][0])
-  const biggestX = rock.reduce((a, b) => (b[0] > a ? b[0] : a), 0)
-  if (pattern === '>' && biggestX === 6) return rock
-  if (pattern === '<' && smallestX === 0) return rock
-  return rock.reduce((a, b, i) => [
-    ...a, [ b[0] + (pattern == '>' ? +1 : -1), b[1] ]
-  ], [])
+const updateY = (rock, y = 1, played) => {
+  return rock.reduce((a, b) => [...a, [b[0], b[1] + y]], [])
 }
 
-const intersect = () => {}
+const updateX = (rock, pattern, played) => {
+  const smallestX = rock.reduce((a, b) => (b[0] < a ? b[0] : a), rock[0][0])
+  const biggestX = rock.reduce((a, b) => (b[0] > a ? b[0] : a), 0)
+  if (
+    (pattern === '>' && biggestX === 6) ||
+    (pattern === '<' && smallestX === 0) ||
+    intersect(rock, played)
+  )
+    return rock
+  return rock.reduce(
+    (a, b, i) => [...a, [b[0] + (pattern == '>' ? +1 : -1), b[1]]],
+    []
+  )
+}
+
+const intersect = (a: number[][], b: number[][]): boolean =>
+  a.some(([x, y]) =>
+    b.some(([bX, bY]) => bX === x && bY === y))
+
+// const intersect2 = (a: number[][], b: number[][]): boolean =>
+// {
+//
+//   for (let list1 of a)
+//   {
+//     for (let list2 of b)
+//     {
+//
+//     }
+//   }
+// }
 
 /**
  * Part 1
  */
 export const part1 = (patterns: TInput) => {
-  const played = []
+  const played: number[][] = [
+    [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0]
+  ]
+  let Y = 0
 
   for (let i = 0; i < 2022; i++) {
-    if (i > 1) return
-    const rock = rocks[i % rocks.length]
-    const pattern = patterns.shift()
+    //if (i > 3) return
 
-    let curr = rock
-    let count = 0
+    const rock = rocks[i % rocks.length]
+    let current = rock
+    current = updateY(rock, Y - 3, played)
+    //log('current', current)
+
     //
-    while (count < 3) {
-      curr = updateX(curr, pattern)
-      curr = updateY(curr)
-      console.log('curr rock', curr)
-      count++
+    while (true) {
+      // log('pattern',pattern)
+      let pattern = patterns.shift()
+      //log('after update X', current)
+      current = updateX(current, pattern, played)
+      //log('after update Y', current)
+      current = updateY(current, 1, played)
+
+      const canUpdateY = () => !(getSmallestY(current) === 0 || intersect(current, played))
+
+      // si pas de played
+      // si un dev vec intersect avec un des vec played
+      if (!canUpdateY())
+      {
+        if (getSmallestY(current) !== 0) current = updateY(current, -1, played)
+
+        // keep vec2s
+        for (let vec2 of current) played.push(vec2)
+
+        // log('played', played)
+        Y = Math.min(getSmallestY(current), Y)
+        log(Y)
+        break
+      }
     }
   }
-  return patterns
+
+  log('Y', Y)
+  return Y
 }
-part1(format('input.test'))
+
+log(part1(format('input.test')))
 
 /**
  * part2

@@ -76,7 +76,6 @@ const intersect = (block: number[][], list: Set<number[]>): boolean => {
  * Part 1
  */
 export const part1 = (patterns: TInput) => {
-
   // start with ground
   const played = new Set([
     [0, 0],
@@ -113,12 +112,65 @@ export const part1 = (patterns: TInput) => {
   }
   return tower
 }
-log(part1(format('input')))
+//log(part1(format('input')))
 
 /**
  * part2
  */
-export const part2 = (input: TInput) => {
-  return input
+export const part2 = (patterns: TInput) => {
+  const played = new Set([
+    [0, 0],
+    [1, 0],
+    [2, 0],
+    [3, 0],
+    [4, 0],
+    [5, 0],
+    [6, 0],
+  ])
+
+  let tower = 0
+  let counter = 0
+
+  let cycleFound = false
+  let cycle
+  let i = 0
+  const steps = new Set<{pattern: string, rock:number, i: number}>()
+
+  while (!cycleFound) {
+    const rock = rocks[i % rocks.length]
+    let current = updateY(rock, tower - 4)
+    i++
+
+    while (true) {
+      let pattern = patterns[counter % patterns.length]
+      counter++
+
+      const s = { pattern, rock: i % rocks.length, i}
+      log(s)
+      steps.add(s)
+
+      if (!intersect(updateX(current, pattern), played)) {
+        current = updateX(current, pattern)
+      }
+      if (!intersect(updateY(current), played)) {
+        current = updateY(current, 1)
+      } else {
+        for (let vec2 of current) played.add(vec2)
+        tower = Math.min(getSmallestY(current), tower)
+
+        // try to detect cycle
+        for (const step of steps.values())
+          if (step.pattern === pattern && step.rock === i % rocks.length)
+          {
+            log("step", step);
+            cycle = step
+            cycleFound = true
+          }
+
+        break
+      }
+    }
+  }
+  return tower
 }
-part2(format('input.test'))
+log(part2(format('input.test')))

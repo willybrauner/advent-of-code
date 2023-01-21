@@ -2,12 +2,13 @@
  * 2022 - Day 14
  *  https://adventofcode.com/2022/day/14
  */
-
 import fs from 'fs'
 import path from 'path'
+import { before } from 'node:test'
 const { log, clear } = console
 clear()
 
+type Rocks = Set<any>
 type Rock = [number, number][]
 type Input = Rock[]
 
@@ -20,17 +21,18 @@ export const format = (filename: 'input.test' | 'input'): Input =>
       e.split(' -> ').map((e) => e.split(',').map((e) => parseInt(e)))
     ) as Input
 
-const getRocksCoords = (input: Input): Map<string, [number, number]> =>
-  input.reduce((a, b) => new Map([...a, ...getOneRockCoords(b)]), new Map())
+const getRocksCoords = (input: Input): Rocks =>
+  input.reduce((a, b) => new Set([...a, ...getOneRockCoords(b)]), new Set())
 
-const getOneRockCoords = (rock: Rock): Map<string, [number, number]> => {
-  const coords = new Map()
-  const setter = (a, b) => coords.set(`${a}-${b}`, [a, b])
+const getOneRockCoords = (rock: Rock): Rocks => {
+  const coords = new Set()
+  const setter = (a, b) => coords.add(`${a},${b}`)
 
   for (let i = 0; i < rock.length; i++) {
     const [cX, cY] = rock[i]
     setter(cX, cY)
     if (!rock?.[i + 1]) return coords
+
     const [nX, nY] = rock[i + 1]
     if (cX != nX) {
       const delta = nX - cX
@@ -39,6 +41,7 @@ const getOneRockCoords = (rock: Rock): Map<string, [number, number]> => {
         setter(cX + j * sign, cY)
       }
     }
+
     if (cY != nY) {
       const delta = nY - cY
       const sign = Math.sign(delta)
@@ -49,18 +52,62 @@ const getOneRockCoords = (rock: Rock): Map<string, [number, number]> => {
   }
 }
 
+const finalSandPosition = (rocks: Rocks) => {
+  const pos = [500, 0]
+  while (true) {
+    let [x, y] = pos
+    const canDown = !rocks.has(`${x},${y + 1}`)
+    const canDownLeft = !rocks.has(`${x - 1},${y + 1}`)
+    const canDownRight = !rocks.has(`${x + 1},${y + 1}`)
+
+    // prettier-ignore
+    if (canDown) {
+     // log('can down', pos)
+      pos[1]++
+    }
+
+    else if (canDownLeft) {
+      //log('can left')
+      pos[0]--
+      pos[1]++
+    }
+
+    else if (canDownRight) {
+      //log('can right')
+      pos[0]++
+      pos[1]++
+    }
+
+    else {
+      //log('stop', pos)
+      break
+    }
+  }
+  return pos
+}
+
 /**
  * Part 1
  */
 export const part1 = (input: Input) => {
-  log(input)
+  const rocks = getRocksCoords(input)
+  let count = 0
+  let lastX = null
+  while (true) {
+    log('/'.repeat(10))
+    const [x, y] = finalSandPosition(rocks)
+    if (x === lastX) {
+      log('count', count)
+      return count
+    }
 
-  const all = getRocksCoords(input)
-  log('all', all)
-
-  return input
+    rocks.add(`${x},${y}`)
+    count++
+    lastX = x
+    log('lastX', lastX)
+  }
 }
-part1(format('input.test'))
+log(part1(format('input.test')))
 
 /**
  * part2

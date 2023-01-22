@@ -21,10 +21,19 @@ export const format = (filename: 'input.test' | 'input'): Input =>
       e.split(' -> ').map((e) => e.split(',').map((e) => parseInt(e)))
     ) as Input
 
-const getRocksCoords = (input: Input): Rocks =>
-  input.reduce((a, b) => new Set([...a, ...getOneRockCoords(b)]), new Set())
+const getMaxY = (rocks: Rocks): number => {
+  let maxY = 0
+  rocks.forEach((e) => {
+    const y = parseInt(e.split(',')[1])
+    if (y > maxY) maxY = y
+  })
+  return maxY
+}
 
-const getOneRockCoords = (rock: Rock): Rocks => {
+const getRocksCoords = (input: Input): Rocks =>
+  input.reduce((a, b) => new Set([...a, ..._getOneRockCoords(b)]), new Set())
+
+const _getOneRockCoords = (rock: Rock): Rocks => {
   const coords = new Set()
   const setter = (a, b) => coords.add(`${a},${b}`)
 
@@ -52,36 +61,23 @@ const getOneRockCoords = (rock: Rock): Rocks => {
   }
 }
 
-const finalSandPosition = (rocks: Rocks) => {
-  const pos = [500, 0]
+const getOneSandPos = (rocks: Rocks, maxY: number): [number, number] => {
+  const pos: [number, number] = [500, 0]
   while (true) {
     let [x, y] = pos
     const canDown = !rocks.has(`${x},${y + 1}`)
     const canDownLeft = !rocks.has(`${x - 1},${y + 1}`)
     const canDownRight = !rocks.has(`${x + 1},${y + 1}`)
-
-    // prettier-ignore
     if (canDown) {
-     // log('can down', pos)
       pos[1]++
-    }
-
-    else if (canDownLeft) {
-      //log('can left')
+      if (pos[1] >= maxY) break
+    } else if (canDownLeft) {
+      pos[1]++
       pos[0]--
+    } else if (canDownRight) {
       pos[1]++
-    }
-
-    else if (canDownRight) {
-      //log('can right')
       pos[0]++
-      pos[1]++
-    }
-
-    else {
-      //log('stop', pos)
-      break
-    }
+    } else break
   }
   return pos
 }
@@ -91,22 +87,19 @@ const finalSandPosition = (rocks: Rocks) => {
  */
 export const part1 = (input: Input) => {
   const rocks = getRocksCoords(input)
+  const maxY = getMaxY(rocks)
   let count = 0
-  let lastX = null
-  while (true) {
-    log('/'.repeat(10))
-    const [x, y] = finalSandPosition(rocks)
-    if (x === lastX) {
-      log('count', count)
-      return count
-    }
 
+  while (true) {
+    const [x, y] = getOneSandPos(rocks, maxY)
+    if (y >= maxY) break
     rocks.add(`${x},${y}`)
     count++
-    lastX = x
-    log('lastX', lastX)
   }
+
+  return count
 }
+
 log(part1(format('input.test')))
 
 /**

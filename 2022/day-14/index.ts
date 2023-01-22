@@ -68,6 +68,8 @@ const getOneSandPos = (rocks: Rocks, maxY: number): [number, number] => {
     const canDown = !rocks.has(`${x},${y + 1}`)
     const canDownLeft = !rocks.has(`${x - 1},${y + 1}`)
     const canDownRight = !rocks.has(`${x + 1},${y + 1}`)
+    if (y === maxY) break
+
     if (canDown) {
       pos[1]++
       if (pos[1] >= maxY) break
@@ -106,6 +108,17 @@ log(part1(format('input.test')))
  * part2
  */
 export const part2 = (input: Input) => {
-  return input
+  const rocks = getRocksCoords(input)
+  const maxY = getMaxY(rocks) + 1
+  let count = 0
+
+  while (true) {
+    const [x, y] = getOneSandPos(rocks, maxY)
+    if (x === 500 && y === 0) break
+    rocks.add(`${x},${y}`)
+    count++
+  }
+
+  return count + 1
 }
-part2(format('input.test'))
+log(part2(format('input')))

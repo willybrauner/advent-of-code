@@ -20,12 +20,12 @@ export const format = (filename: 'input.test' | 'input'): Input =>
     .filter((e) => e.filter((e) => e).length)
     .map(([s, b], _) => {
       const [sx, sy] = s
-        ?.replace('Sensor at x=', '')
+        .replace('Sensor at x=', '')
         .replace(' y=', '')
         .split(',')
         .map(Number)
       const [bx, by] = b
-        ?.replace('closest beacon is at x=', '')
+        .replace('closest beacon is at x=', '')
         .replace(' y=', '')
         .split(',')
         .map(Number)
@@ -34,22 +34,34 @@ export const format = (filename: 'input.test' | 'input'): Input =>
 
 // -----------------------------------------------------------------------------
 
-const getManhattanDistance = (sensor: Coord, beacon: Coord) =>
-  Math.abs(beacon.x - sensor.x + beacon.y - sensor.y)
-
 /**
  * Part 1
  */
-export const part1 = (input: Input) => {
-  log(input)
+// prettier-ignore
+export const part1 = (input: Input, rowY = 10) => {
+  const busy = new Set()
 
-  for (let { sensor, beacon } of input) {
-    log(getManhattanDistance(sensor, beacon))
+  for (let { sensor, beacon } of input)
+  {
+    const manhattan = Math.abs(beacon.x - sensor.x) + Math.abs(beacon.y - sensor.y)
+    const d = manhattan - Math.abs(sensor.y - rowY)
+
+    if (d < 0) continue
+
+    for (let i = 0; i <= d - 1; i++)
+      busy.add(sensor.x + i),
+      busy.add(sensor.x - i)
+
+    if (
+      (beacon.x !== sensor.x + d || beacon.y !== rowY) ||
+      (beacon.x !== sensor.x - d || beacon.y !== rowY)
+    )
+      busy.add(sensor.x + d)
   }
-
-  return input
+  return busy.size
 }
-part1(format('input.test'))
+
+log(part1(format('input'), 2000000))
 
 /**
  * part2

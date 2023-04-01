@@ -8,16 +8,45 @@ import path from 'path'
 const { log, clear } = console
 clear()
 
-export type Input = any
+type Coord = { x: number; y: number }
+type Group = { sensor: Coord; beacon: Coord }
+type Input = Group[]
 
 export const format = (filename: 'input.test' | 'input'): Input =>
-  fs.readFileSync(path.resolve(__dirname, filename), 'utf8')
+  fs
+    .readFileSync(path.resolve(__dirname, filename), 'utf8')
+    .split('\n')
+    .map((l) => l.split(':'))
+    .filter((e) => e.filter((e) => e).length)
+    .map(([s, b], _) => {
+      const [sx, sy] = s
+        ?.replace('Sensor at x=', '')
+        .replace(' y=', '')
+        .split(',')
+        .map(Number)
+      const [bx, by] = b
+        ?.replace('closest beacon is at x=', '')
+        .replace(' y=', '')
+        .split(',')
+        .map(Number)
+      return { sensor: { x: sx, y: sy }, beacon: { x: bx, y: by } }
+    })
+
+// -----------------------------------------------------------------------------
+
+const getManhattanDistance = (sensor: Coord, beacon: Coord) =>
+  Math.abs(beacon.x - sensor.x + beacon.y - sensor.y)
 
 /**
  * Part 1
  */
 export const part1 = (input: Input) => {
   log(input)
+
+  for (let { sensor, beacon } of input) {
+    log(getManhattanDistance(sensor, beacon))
+  }
+
   return input
 }
 part1(format('input.test'))

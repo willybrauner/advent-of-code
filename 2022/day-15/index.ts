@@ -47,7 +47,6 @@ export const part1 = (input: Input, rowY = 10) => {
     const d = manhattan - Math.abs(sensor.y - rowY)
 
     if (d < 0) continue
-
     for (let i = 0; i <= d - 1; i++)
       busy.add(sensor.x + i),
       busy.add(sensor.x - i)

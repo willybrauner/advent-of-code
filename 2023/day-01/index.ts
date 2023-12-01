@@ -27,40 +27,39 @@ const part2 = (filename) =>
     .readFileSync(resolve(__dirname, filename), 'utf8')
     .split('\n')
     .filter(Boolean)
-    .reduce((acc, curr, i) => {
-      // prettier-ignore
-      const strings = [
-       'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine',
-       '1', '2', '3', '4', '5', '6', '7', '8', '9',
-      ]
+    .map((line) =>
+      // insert number value in the string before each numberString
+      // ex: two1nine -> 2two19nine
+      line
+        // replace() can receive regexp instead of string as first arg
+        // and a callback function as second arg
+        .replace(
+          /(?=(one|two|three|four|five|six|seven|eight|nine))/g,
+          (match, key) =>
+            '*%&zero**$ one two three four five six seven eight nine'
+              .split(' ')
+              .indexOf(key) as any,
+        )
+        // split current line
+        // ex: '2two19nine' -> [ '2', 't', 'w', 'o' ...]
+        .split('')
+        // keep only number with regexp with \d -> (0 - 9)
+        // ex: [ '2', 't', 'w', 'o' ...] -> [ '2', ...]
+        .filter((e) => /\d/.test(e))
+        // keep only first and last
+        // We can access to the current arr with the 3td param!
+        .filter((e, i, arr) => i === 0 || i === arr.length - 1),
+    )
+    // because arr is sometimes incomplete
+    // if there is only one numb in line, the last need to be the same than the first
+    // We have to return the first and the last...
+    // ex: ["4"] -> need to be ["4", "4"]
+    .map((e) => {
+      if (e.length === 1) e[1] = e[0]
+      return parseInt(e.join(''))
+    })
 
-      const numbs = []
-      const recursive = (current) => {
-        for (let i = 0; i < strings.length; i++) {
-          const str = strings[i]
-          if (new RegExp(`^${str}`).test(current)) {
-            numbs.push(str)
-            const s = current.slice(str.length)
-            return recursive(s)
-          }
-        }
-        if (current.length) {
-          const s = current.slice(1)
-          return recursive(s)
-        }
-      }
-
-      recursive(curr)
-
-      const convertNumbs = numbs.map((e) =>
-        Number.isNaN(parseInt(e)) ? `${strings.indexOf(e) + 1}` : e,
-      )
-
-      const num = parseInt(
-        convertNumbs[0] + convertNumbs[convertNumbs.length - 1],
-      )
-
-      return acc + num
-    }, 0)
+    // finally...
+    .reduce((a, b) => a + b, 0)
 
 log(part2('input'))

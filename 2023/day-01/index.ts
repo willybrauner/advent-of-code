@@ -20,7 +20,7 @@ const part1 = (filename) =>
       return a + num
     }, 0)
 
-// log(part1('input'))
+log(part1('input'))
 
 const part2 = (filename) =>
   fs

@@ -39,13 +39,11 @@ const part1 = (input: Input) =>
       [13, 'green'],
       [14, 'blue'],
     ]
-
     let isValid = true
     for (let [limitNum, color] of limits) {
       const biggest = game.reduce((a, subset) => {
-        // le nombre de cub de la couleur courante dans le subset courant
-        const currColorNum = subset.find((e) => e[1] === color)?.[0] || 0
-        return a > currColorNum ? a : currColorNum
+        const num = subset.find((e) => e[1] === color)?.[0] || 0
+        return a > num ? a : num
       }, 0)
       if (biggest > limitNum) isValid = false
     }
@@ -54,7 +52,21 @@ const part1 = (input: Input) =>
 
 log(part1(format('input')))
 
-const part2 = (input: Input) => {
-  return input
-}
-part2(format('input.test'))
+const part2 = (input: Input) =>
+  input.reduce((acc, game, index) => {
+    const minimums: [number, Colors][] = [
+      [null, 'red'],
+      [null, 'green'],
+      [null, 'blue'],
+    ]
+    for (let i = 0; i < minimums.length; i++) {
+      const [_, color] = minimums[i]
+      minimums[i][0] = game.reduce((a, subset) => {
+        const num = subset.find((e) => e[1] === color)?.[0] || 0
+        return a > num ? a : num
+      }, 0)
+    }
+    return acc + minimums.reduce((a, b) => a * b[0], 1)
+  }, 0)
+
+log(part2(format('input')))

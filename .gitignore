@@ -2,3 +2,6 @@
 .vscode
 node_modules
 .DS_Store
+input
+input.txt
+inputs.txt

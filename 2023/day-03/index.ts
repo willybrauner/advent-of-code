@@ -7,17 +7,17 @@ import fs from 'fs'
 import path from 'path'
 const { log, clear } = console
 
-type Coords = Record<string, string>
+type Numbs = Record<string, string>
 type Symbols = Record<string, string>
 type Input = {
-  coords: Coords
+  nums: Numbs
   symbols: Symbols
 }
 
 /**
  Data struct
  {
-  coords: {
+  nums: {
     '0,0': '467',
     '0,5': '114'
     ...
@@ -53,23 +53,46 @@ const format = (filename: 'input.test' | 'input'): Input =>
           }
         } else {
           symbols[`${y},${x}`] = char
+          if (num !== '') {
+            coords[`${y},${startX}`] = num
+            num = ''
+          }
         }
       }
       // record last if curr num is not empty
       if (num !== '') coords[`${y},${startX}`] = num
       return {
-        coords: { ...acc.coords, ...coords },
+        nums: { ...acc.nums, ...coords },
         symbols: { ...acc.symbols, ...symbols },
       }
     }, {} as Input)
 
-const part1 = (input: Input) => {
-  clear()
+const part1 = ({ nums, symbols }: Input) => {
+  console.log({ nums, symbols })
+  let count = 0
+  for (let [yx, num] of Object.entries(nums)) {
+    const [y, x] = yx.split(',').map((e) => parseInt(e))
 
-  return input
+    let adj = [-1, 0, 1].reduce((a, b) => {
+      return [
+        ...a,
+        ...new Array(num.length + 2)
+          .fill(null)
+          .map((e, i) => `${Math.max(0, y + b)},${Math.max(0, x + i - 1)}`),
+      ]
+    }, [])
+    adj = [...new Set(adj)]
+    for (let [symbolYX, symbol] of Object.entries(symbols)) {
+      if (adj.includes(symbolYX)) {
+        log(`symbolYX ${symbolYX} ${symbol} match with ${num}`, adj)
+        count += parseInt(num)
+      }
+    }
+  }
+  return count
 }
 
-log(part1(format('input.test')))
+log(part1(format('input')))
 
 const part2 = (input: Input) => {
   return input

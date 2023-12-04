@@ -29,10 +29,11 @@ const format = (filename: 'input.test' | 'input'): Input =>
         ),
     )
 
+const matchEntries = (a1, a2) =>
+  a1.reduce((a, b) => [...a, ...(a2.includes(b) ? [b] : [])], [])
+
 const part1 = (input: Input) =>
   input.reduce((a, b) => {
-    const matchEntries = (a1, a2) =>
-      a1.reduce((a, b) => [...a, ...(a2.includes(b) ? [b] : [])], [])
     const calc = (arr) => arr.reduce((a, b, i) => (i === 0 ? 1 : a * 2), 0)
     return a + calc(matchEntries(b[0], b[1]))
   }, 0)
@@ -40,6 +41,13 @@ const part1 = (input: Input) =>
 log(part1(format('input')))
 
 const part2 = (input: Input) => {
-  return input
+  const won = {}
+  return input.reduce((a, b, i) => {
+    for (let j = 1; j <= matchEntries(b[0], b[1]).length; j++) {
+      won[i + j] = (won[i + j] || 0) + (won[i] || 0) + 1
+    }
+    return a + (won[i] || 0) + 1
+  }, 0)
 }
-part2(format('input.test'))
+
+log(part2(format('input')))

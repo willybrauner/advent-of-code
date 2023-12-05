@@ -40,13 +40,22 @@ const format = (filename: 'input.test' | 'input'): Input =>
       return a
     }, { seeds:null, maps:[] })
 
-const part1 = ({ seeds, maps }: Input) => {
-  log('seeds', seeds)
-  log('maps', maps)
 
-  //return input
+const part1 = ({ seeds, maps }: Input) => {
+  const rec = (input, map, index = 0) => {
+    if (!map) return input
+    index++
+    for (let [dest, source, length] of map)
+      if (input >= source && input < source + length)
+        return rec(dest + (input - source), maps?.[index], index)
+    return rec(input, maps[index], index)
+  }
+  return seeds
+    .reduce((a, b) => [...a, rec(b, maps[0], 0)], [])
+    .reduce((a, b) => (a < b ? a : b))
 }
-log(part1(format('input.test')))
+
+log(part1(format('input')))
 
 const part2 = (input: Input) => {
   return input

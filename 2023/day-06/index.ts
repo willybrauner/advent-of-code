@@ -17,12 +17,9 @@ const format = (filename: 'input.test' | 'input'): Input =>
     .map((e) => e.split(' ').filter((e) => /\d/.test(e)))
 
 const run = (time, distance): number => {
-  const won = []
-  for (let i = 1; i < time; i++) {
-    const millimeters = (time - i) * i
-    if (millimeters > distance) won.push(millimeters)
-  }
-  return won.length
+  let count = 0
+  for (let i = 1; i < time; i++) if ((time - i) * i > distance) count++
+  return count
 }
 
 const part1 = (input: Input): number =>

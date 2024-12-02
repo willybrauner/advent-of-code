@@ -1,6 +1,6 @@
 /**
- * 2024 - Day 02
- * https://adventofcode.com/2024/day/02
+ * 2024 - Day 2
+ * https://adventofcode.com/2024/day/2
  */
 
 import fs from 'fs'

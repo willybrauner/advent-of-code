@@ -1,8 +1,0 @@
-{
-  "execMap": {
-    "ts": "ts-node --transpileOnly"
-  },
-  "events": {
-    "start": "date"
-  }
-}

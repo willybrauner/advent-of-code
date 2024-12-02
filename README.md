@@ -24,5 +24,5 @@ npm i
 Run watch on specific puzzle:
 
 ```shell
-tsx watch 2024/day-01/
+npx tsx watch 2024/day-01/
 ```

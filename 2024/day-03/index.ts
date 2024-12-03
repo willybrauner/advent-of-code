@@ -5,7 +5,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-type Input = any
+type Input = string
 const useInput = (filename: 'input.test' | 'input'): Input =>
   fs.readFileSync(path.join(__dirname, filename), 'utf-8')
 
@@ -21,10 +21,28 @@ const part1 = (input: Input) :number =>
         )[0]
     ,0)
 
-console.log(part1(useInput('input')))
+part1(useInput('input'))
 
-const part2 = (input: Input) => {
-  return input
+const part2 = (input: Input): number => {
+  const segments = ("do()"+input).split(/(do\(\)|don't\(\))/)
+  let flag = false
+  let count = 0
+  for (let segment of segments)
+    if (segment === "do()")
+      flag = true
+    else if (segment === "don't()")
+      flag = false
+    else
+      if (flag)
+        count += segment.match(/mul\(\d{1,3},\d{1,3}\)/g)
+            .map(e =>
+              e.match(/\d{1,3},\d{1,3}/g)[0]
+              .split(',')
+              .map(e => parseInt(e))
+              .reduce((c, d) => c * d, 1)
+            )
+            .reduce((a, b) => a + b, 0)
+  return count
 }
 
-part2(useInput('input.test'))
+part2(useInput('input'))

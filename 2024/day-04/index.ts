@@ -1,9 +1,9 @@
 /**
- * 2024 - Day
- * https://adventofcode.com/2024/day/
+ * 2024 - Day 4
+ * https://adventofcode.com/2024/day/4
  */
 import fs from 'fs'
-import path from 'path'
+import path, { resolve } from 'path'
 const { log, clear } = console
 clear()
 
@@ -15,32 +15,30 @@ const useInput = (filename: 'input.test' | 'input'): Input =>
     .map((line) => line.split(''))
 
 const part1 = (input: Input) => {
-  const match = (arr: string[]) => arr.filter(Boolean).join('XMAS')
+  // prettier-ignore
+  const dirs = [
+    [-1, -1], [-1, 0], [-1, 1],
+    [0, -1], [0, 0], [0, 1],
+    [1, -1], [1, 0] , [1, 1],
+  ]
+  const coords = (y: number, x: number): number[][][] =>
+    dirs.map(([dy, dx]) =>
+      new Array(4).fill(null).map((_, i) => [y + i * dy, x + i * dx]),
+    )
 
+  let count = 0
+  for (let y = 0; y < input.length; y++)
+    for (let x = 0; x < input[y].length; x++)
+      for (let dir of coords(y, x)) {
+        const letters = []
+        for (let [cy, cx] of dir) letters.push(input?.[cy]?.[cx] || '')
+        if (letters.join('') == 'XMAS') count++
+      }
 
-  const coords = [-3, -2, -1, 0, 1, 2, 3].map((_, i) => [
-    [0 + i, 0 + i],
-    [0 + i, 1 + i],
-    [1 + i, 0 + i],
-    [1 + i, 1, + i],
-    [1 + i, -1 + i],
-    [-1 + i, 0 + i],
-    [-1 + i, -1 + i],
-    [-1 + i, 1 + i],
-  ])
-
-  log(coords)
-
-  for (let y = 0; y < input.length; y++) {
-    for (let x = 0; x < input[y].length; x++) {
-      const char = input[y][x]
-      // log(char)
-    }
-  }
-  return input
+  return count
 }
 
-part1(useInput('input.test'))
+log(part1(useInput('input')))
 
 const part2 = (input: Input) => {
   return input

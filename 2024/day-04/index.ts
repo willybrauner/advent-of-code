@@ -3,8 +3,8 @@
  * https://adventofcode.com/2024/day/4
  */
 import fs from 'fs'
-import path, { resolve } from 'path'
-const { log, clear } = console
+import path from 'path'
+const { clear } = console
 clear()
 
 type Input = string[][]
@@ -34,13 +34,32 @@ const part1 = (input: Input) => {
         for (let [cy, cx] of dir) letters.push(input?.[cy]?.[cx] || '')
         if (letters.join('') == 'XMAS') count++
       }
-
   return count
 }
 
-log(part1(useInput('input')))
+part1(useInput('input.test'))
 
 const part2 = (input: Input) => {
-  return input
+  // prettier-ignore
+  const coords = (y:number, x:number): number[][][] => [
+      [[y-1,x-1], [y, x], [y+1, x+1]],
+      [[y+1,x-1], [y, x], [y-1, x+1]],
+    ]
+
+  let count = 0
+  for (let y = 0; y < input.length; y++)
+    for (let x = 0; x < input[y].length; x++) {
+      let hasXShape = 0
+      for (let dir of coords(y, x)) {
+        const letters = []
+        for (let [cy, cx] of dir) letters.push(input?.[cy]?.[cx] || '')
+        if (letters.join('') == 'MAS' || letters.join('') == 'SAM') {
+          hasXShape++
+          if (hasXShape === 2) count++
+        }
+      }
+    }
+
+  return count
 }
-part2(useInput('input.test'))
+part2(useInput('input'))

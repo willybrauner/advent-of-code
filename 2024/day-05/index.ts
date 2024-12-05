@@ -4,8 +4,6 @@
  */
 import fs from 'fs'
 import path from 'path'
-const { log, clear } = console
-clear()
 
 type OrderingRules = [number, number][]
 type Updates = number[][]
@@ -33,9 +31,30 @@ const part1 = ([rules, updates]: Input) =>
     return a + (valid ? update[(update.length - 1) / 2] : 0)
   }, 0)
 
-log(part1(useInput('input')))
+part1(useInput('input'))
 
-const part2 = (input: Input) => {
-  return input
-}
-part2(useInput('input.test'))
+const part2 = ([rules, updates]: Input) =>
+  updates.reduce((a, update) => {
+    const isValid = (up: number[]): boolean =>
+      rules
+        .filter(([x, y]) => up.includes(x) && up.includes(y))
+        .every(([x, y]) => up.indexOf(x) < up.indexOf(y))
+    if (isValid(update)) return a
+
+    const check = (up: number[]): number => {
+      if (isValid(up)) return up[(up.length - 1) / 2]
+      for (let [x, y] of rules) {
+        const xi = up.indexOf(x)
+        const yi = up.indexOf(y)
+        if (xi !== -1 && yi !== -1 && xi > yi) {
+          const temp = up[xi]
+          up[xi] = up[yi]
+          up[yi] = temp
+          return check(up)
+        }
+      }
+    }
+    return a + check(update)
+  }, 0)
+
+part2(useInput('input'))

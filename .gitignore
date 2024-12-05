@@ -5,3 +5,4 @@ node_modules
 input
 input.txt
 inputs.txt
+!_template/input

@@ -32,8 +32,8 @@ const findObstacles = (input: Input): Coords[] => {
   return obstacles
 }
 
-const moveGuard = (guard: Coords, obstacles: Coords[], input: Input) => {
-  const step = ([y, x]: Coords, dir: number, count: number) => {
+const moveGuard = async (guard: Coords, obstacles: Coords[], input: Input) => {
+  const step = async ([y, x]: Coords, dir: number, count: number) => {
     let ny = y
     let nx = x
 
@@ -44,41 +44,35 @@ const moveGuard = (guard: Coords, obstacles: Coords[], input: Input) => {
     if (dir === 3) nx--
 
     // check if we are out of bounds
-    if (ny < 0 || ny > input.length - 1 || nx < 0 || nx > input[ny].length - 1) {
-      log('FINISH, guard pos is', [y, x], count)
+    if (ny < 0 || ny >= input.length || nx < 0 || nx >= input[ny].length)
       return count
-    }
 
     // check if there is a collision with #
     // mutate the dir & restart before mutate guard position
     if (obstacles.some(([oy, ox]) => oy === ny && ox === nx)) {
-      count += input[y][x] === '^' ? 0 : (input[y][x] as number)
+      input[y][x] = 0
       return step([y, x], (dir + 1) % 4, count)
     }
 
     y = ny
     x = nx
-    log([y, x], input[y][x])
-
     count += input[y][x] === '^' ? 0 : (input[y][x] as number)
     input[y][x] = 0
+
+    // because my runtime failed due to the number of steps
+    if (count % 1000 === 0) await new Promise((r) => setTimeout(r, 1))
     return step([y, x], dir, count)
   }
-
   // next step
   return step(guard, 0, 1)
 }
 
-const part1 = (input: Input) => {
+const part1 = async (input: Input) => {
   const guard = findGuard(input)
-  log('guard', guard)
   const obstacles = findObstacles(input)
-  const moves = moveGuard(guard, obstacles, input)
-  log('moves', moves)
-
-  return input
+  return await moveGuard(guard, obstacles, input)
 }
-part1(useInput('input'))
+part1(useInput('input')).then((e) => log(e))
 
 const part2 = (input: Input) => {
   return input

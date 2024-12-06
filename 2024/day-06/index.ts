@@ -7,7 +7,7 @@ import path from 'path'
 const { log, clear } = console
 clear()
 
-type Input = (string | number)[][]
+type Input = string[][]
 type Coords = [number, number]
 
 const useInput = (filename: 'input.test' | 'input'): Input =>
@@ -16,7 +16,6 @@ const useInput = (filename: 'input.test' | 'input'): Input =>
     .split('\n')
     .filter(Boolean)
     .map((e) => e.split(''))
-    .map((e) => e.map((e) => (e === '.' ? 1 : e)))
 
 const findGuard = (input: Input): Coords => {
   for (let y = 0; y < input.length; y++)
@@ -32,49 +31,73 @@ const findObstacles = (input: Input): Coords[] => {
   return obstacles
 }
 
-const moveGuard = async (guard: Coords, obstacles: Coords[], input: Input) => {
-  const step = async ([y, x]: Coords, dir: number, count: number) => {
+const moveGuard = (
+  [y, x]: Coords,
+  obstacles: Coords[],
+  input: Input,
+  preventLoops = false,
+): { visited: Set<string>; isLoop: boolean } => {
+  const visited = new Set<string>()
+  const obstacleSet = new Set(obstacles.map(([oy, ox]) => `${oy},${ox}`)) // Optimize obstacle lookup
+  let dir = 0
+
+  while (true) {
+    const key = `${y},${x}` + (preventLoops ? `,${dir}` : '')
+    if (preventLoops && visited.has(key)) {
+      return { visited, isLoop: true }
+    }
+    visited.add(key)
+
     let ny = y
     let nx = x
-
-    // update the guard position
     if (dir === 0) ny--
     if (dir === 1) nx++
     if (dir === 2) ny++
     if (dir === 3) nx--
 
-    // check if we are out of bounds
+    // If the guard get go out the grid
     if (ny < 0 || ny >= input.length || nx < 0 || nx >= input[ny].length)
-      return count
+      return { visited, isLoop: false }
 
-    // check if there is a collision with #
-    // mutate the dir & restart before mutate guard position
-    if (obstacles.some(([oy, ox]) => oy === ny && ox === nx)) {
-      input[y][x] = 0
-      return step([y, x], (dir + 1) % 4, count)
+    // If the next is an obstacle
+    // I was searching inside obstacles on each frame but doesn't work on part 2
+    // Need to use an externalized Set.
+    //  if (obstacles.some(([oy, ox]) => oy === ny && ox === nx)) {
+    if (obstacleSet.has(`${ny},${nx}`)) {
+      // update dir
+      dir = (dir + 1) % 4
+    } else {
+      // update coords
+      y = ny
+      x = nx
     }
-
-    y = ny
-    x = nx
-    count += input[y][x] === '^' ? 0 : (input[y][x] as number)
-    input[y][x] = 0
-
-    // because my runtime failed due to the number of steps
-    if (count % 1000 === 0) await new Promise((r) => setTimeout(r, 1))
-    return step([y, x], dir, count)
   }
-  // next step
-  return step(guard, 0, 1)
 }
 
-const part1 = async (input: Input) => {
+const part1 = (input: Input) => {
   const guard = findGuard(input)
   const obstacles = findObstacles(input)
-  return await moveGuard(guard, obstacles, input)
+  const { visited } = moveGuard(guard, obstacles, input)
+  return visited.size
 }
-part1(useInput('input')).then((e) => log(e))
 
-const part2 = (input: Input) => {
-  return input
+log(part1(useInput('input')))
+
+const part2 = (input: Input): number => {
+  const guard = findGuard(input)
+  const obstacles = findObstacles(input)
+  const { visited } = moveGuard(guard, obstacles, input, true)
+
+  const obstructionCoords = new Set<string>()
+  for (const coords of visited) {
+    const [y, x] = coords.split(',').map(Number)
+    if (y === guard[0] && x === guard[1]) continue
+    const modifiedObstacles: Coords[] = [...obstacles, [y, x]]
+    const { isLoop } = moveGuard(guard, modifiedObstacles, input, true)
+    if (isLoop) obstructionCoords.add(`${y},${x}`)
+  }
+  return obstructionCoords.size
 }
-part2(useInput('input.test'))
+
+// Run part2
+log(part2(useInput('input')))

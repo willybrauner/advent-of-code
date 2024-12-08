@@ -28,32 +28,53 @@ const useInput = (filename: 'input.test' | 'input'): Input =>
     }, [] as Input)
 
 const part1 = (input: Input) => {
-  return input.reduce((a, [target, nums]) => {
-    const search = (nums: number[], target: number): number => {
-      const calc = (index: number, current: number): number => {
-        // All numbers are used
-        if (index === nums.length) return current === target ? current : 0
-        // Try multiplication
-        const mRes = calc(index + 1, current * nums[index])
-        if (mRes === target) return mRes
-        // Try addition
-        const addRes = calc(index + 1, current + nums[index])
-        if (addRes === target) return addRes
+  const search = (nums: number[], target: number): number => {
+    const calc = (index: number, curr: number): number => {
+      // All numbers are used
+      if (index === nums.length) {
+        return curr === target ? curr : 0
       }
-      // for each nums, start nums calc
-      for (let i = 0; i < nums.length; i++) {
-        const result = calc(i + 1, nums[i])
-        if (result === target) return result
+      // test all possibilities recursively
+      for (const nextCurr of [curr * nums[index], curr + nums[index]]) {
+        const res = calc(index + 1, nextCurr)
+        if (res === target) return res
+      }
+      // fallback
+      return 0
+    }
+    // for each nums, start nums calc
+    for (let i = 0; i < nums.length; i++) {
+      const result = calc(i + 1, nums[i])
+      if (result === target) return result
+    }
+    return 0
+  }
+  return input.reduce((a, [target, nums]) => a + search(nums, target), 0)
+}
+log(part1(useInput('input')))
+
+const part2 = (input: Input) => {
+  const search = (nums: number[], target: number): number => {
+    const calc = (index: number, curr: number): number => {
+      if (index === nums.length) return curr === target ? curr : 0
+
+      const multiply = curr * nums[index]
+      const add = curr + nums[index]
+      const concat = parseInt(`${curr}${nums[index]}`)
+
+      for (const nextCurr of [multiply, add, concat]) {
+        const res = calc(index + 1, nextCurr)
+        if (res === target) return res
       }
       return 0
     }
-    return a + search(nums, target)
-  }, 0)
-}
-log(part1(useInput('input')))
-//log(part1(useInput('input')))
 
-const part2 = (input: Input) => {
-  return input
+    for (let i = 0; i < nums.length; i++) {
+      const result = calc(i + 1, nums[i])
+      if (result === target) return result
+    }
+    return 0
+  }
+  return input.reduce((a, [target, nums]) => a + search(nums, target), 0)
 }
-part2(useInput('input.test'))
+log(part2(useInput('input.test')))

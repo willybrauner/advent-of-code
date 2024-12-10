@@ -29,38 +29,26 @@ const getAntennas = (input: Input): Map<string, Coords[]> => {
   return antennas
 }
 
-const isAligned = ([y1, x1]: Coords, [y2, x2]: Coords) => {
-  return (
-    // match horizontal
-    y1 === y2 ||
-    // match vertical
-    x1 === x2 ||
-    // match diagonal
-    Math.abs(x2 - x1) === Math.abs(y2 - y1)
-  )
-}
-
-// only when one of the antennas is twice as far away as the other
-const isRightDistance = ([y1, x1]: Coords, [y2, x2]: Coords) => {
-  return Math.abs(x1 - x2) === Math.abs(y1 - y2) * 2
-}
-
+// prettier-ignore
 const part1 = (input: Input) => {
   const antennas = getAntennas(input)
   const antinodes = new Set()
-  antennas.forEach((list, key) => {
-    log(key, list)
-    for (let i = 0; i < list.length; i++)
-      for (let j = i + 1; j < list.length; j++)
-        if (isAligned(list[i], list[j]) && isRightDistance(list[i], list[j])) {
-          const midX = (list[i][1] + list[j][1]) / 2
-          const midY = (list[i][0] + list[j][0]) / 2
-          antinodes.add(`${midX},${midY}`)
-        }
+  antennas.forEach((list) => {
+    for (let i = 0; i < list.length; i++) 
+      for (let j = 0; j < list.length; j++) {
+        if (i === j) continue
+        const [y1, x1] = list[i]
+        const [y2, x2] = list[j]
+        const y = y2 + (y2 - y1)
+        const x = x2 + (x2 - x1)
+        if (!(y > input.length - 1 || y < 0 || x > input[0].length - 1 || x < 0)) 
+          antinodes.add(`${y},${x}`)        
+      }
+    
   })
   return antinodes.size
 }
-log(part1(useInput('input.test')))
+log(part1(useInput('input')))
 
 const part2 = (input: Input) => {
   return input

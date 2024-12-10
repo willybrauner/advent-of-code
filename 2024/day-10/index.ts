@@ -25,12 +25,13 @@ const getTrailheads = (input: Input): Coords[] => {
 }
 
 // prettier-ignore
-const score = (input: Input, [sy, sx]: Coords): number => {
+const score = (input: Input, [sy, sx]: Coords, checkAllPaths = false): number => {
   const dirs = [[1, 0],[0, 1],[-1, 0],[0, -1]]
   const stack: Coords[] = [[sy, sx]]
   const visited = new Set<string>()
   visited.add(`${sy},${sx}`)
   let count = 0
+  let rating = 0
   
   while (stack.length) {
     const [y, x] = stack.pop()
@@ -43,15 +44,17 @@ const score = (input: Input, [sy, sx]: Coords): number => {
 
       if (
         next === (curr as number) + 1 && 
-        !visited.has(`${ny},${nx}`)
+        (checkAllPaths || !visited.has(`${ny},${nx}`))
       ) {
         stack.push([ny, nx])
         visited.add(`${ny},${nx}`)
-        if (next === 9) count++
+        if (next === 9) {
+          count++
+          rating += 1
+        }
       }
     }
   }
-
   return count
 }
 
@@ -63,7 +66,10 @@ const part1 = (input: Input) =>
 
 log(part1(useInput('input')))
 
-const part2 = (input: Input) => {
-  return input
-}
-part2(useInput('input.test'))
+const part2 = (input: Input) =>
+  getTrailheads(input).reduce(
+    (a: number, coords: Coords) => a + score(input, coords, true),
+    0,
+  )
+
+log(part2(useInput('input')))

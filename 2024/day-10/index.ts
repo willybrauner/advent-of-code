@@ -27,13 +27,13 @@ const getTrailheads = (input: Input): Coords[] => {
 // prettier-ignore
 const score = (input: Input, [sy, sx]: Coords): number => {
   const dirs = [[1, 0],[0, 1],[-1, 0],[0, -1]]
-  const queue: Coords[] = [[sy, sx]]
+  const stack: Coords[] = [[sy, sx]]
   const visited = new Set<string>()
   visited.add(`${sy},${sx}`)
   let count = 0
-
-  while (queue.length) {
-    const [y, x] = queue.pop()
+  
+  while (stack.length) {
+    const [y, x] = stack.pop()
     visited.add(`${y},${x}`)
 
     for (const [dy, dx] of dirs) {
@@ -45,13 +45,13 @@ const score = (input: Input, [sy, sx]: Coords): number => {
         next === (curr as number) + 1 && 
         !visited.has(`${ny},${nx}`)
       ) {
-        queue.push([ny, nx])
+        stack.push([ny, nx])
         visited.add(`${ny},${nx}`)
         if (next === 9) count++
       }
     }
   }
-  
+
   return count
 }
 

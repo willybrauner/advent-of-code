@@ -35,26 +35,16 @@ part1(useInput('input.test'))
 const part2 = (input: Input) => {
   return input.reduce(
     (a, b) => {
-      // signed remainder -99, 99
-      const partial = b % 100
-      // count numb of rounds
-      const rounds = Math.floor(Math.abs(b / 100))
-      // positive modulo
-      const value = (a.value + (partial + 100)) % 100
-      // determine if we cross 0 without full round
-      const isCrossedPartial =
-        partial !== 0 && (value - a.value) * Math.sign(partial) < 0
-      // calc count
-      const count = a.count + rounds + (isCrossedPartial ? 1 : 0)
-
-      return {
-        count,
-        value,
+      let value = a.value
+      let count = a.count
+      for (let i = 0; i < Math.abs(b); i++) {
+        value = (value + Math.sign(b) + 100) % 100
+        if (value === 0) count += 1
       }
+      return { count, value }
     },
     { value: 50, count: 0 },
   )
 }
-
-// 👀
 log(part2(useInput('input')))
+

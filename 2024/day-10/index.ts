@@ -35,6 +35,8 @@ const score = (input: Input, [sy, sx]: Coords, checkAllPaths = false): number =>
   
   while (stack.length) {
     const [y, x] = stack.pop()
+//    const [y, x] = queue.shift() // Utiliser shift() pour BFS au lieu de pop() pour DFS
+
     visited.add(`${y},${x}`)
 
     for (const [dy, dx] of dirs) {

@@ -2,6 +2,7 @@
 
 Personal [Advent of Code](https://adventofcode.com/) puzzle solutions ⭐️⭐️
 
+- [2025](2025/)
 - [2024](2024/)
 - [2023](2023/)
 - [2022](2022/)

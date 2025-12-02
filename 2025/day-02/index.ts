@@ -28,7 +28,7 @@ const part1 = (input: Input) => {
     const [start, end] = input[i]
     for (let s = start; s <= end; s++) {
       const numToStrings = s.toString().split('')
-      
+
       // check if even
       if (numToStrings.length % 2 !== 0) continue
       const [part1, part2] = _chunkArr(numToStrings, numToStrings.length / 2)
@@ -38,12 +38,30 @@ const part1 = (input: Input) => {
       if (toNum(part1) === toNum(part2)) invalids += toNum(numToStrings)
     }
   }
-
   return invalids
 }
-log(part1(useInput('input')))
+part1(useInput('input'))
 
 const part2 = (input: Input) => {
-  return input
+  let invalids = 0
+  for (let i = 0; i < input.length; i++) {
+    const [start, end] = input[i]
+    for (let s = start; s <= end; s++) {
+      const numToStrings = s.toString().split('')
+      let hasInvalid = false
+
+      for (let l = 1; l <= numToStrings.length; l++) {
+        if (hasInvalid) continue
+        const parts = _chunkArr(numToStrings, l).map((e) => e.join(''))
+        if (parts.length < 2) continue
+
+        if (new Set([...parts]).size === 1) {
+          invalids += parseInt(numToStrings.join(''))
+          hasInvalid = true
+        }
+      }
+    }
+  }
+  return invalids
 }
-part2(useInput('input.test'))
+part2(useInput('input'))

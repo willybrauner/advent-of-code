@@ -32,9 +32,24 @@ const part1 = (input: Input) => {
   return count
 }
 
-log(part1(useInput('input')))
+part1(useInput('input'))
 
 const part2 = (input: Input) => {
-  return input
+  let count = 0
+  for (let i = 0; i < input.length; i++) {
+    let batteries = input[i]
+    let largest = 0
+    let start = 0
+    for (let i = 0; i <= 11; i++) {
+      const needAfter = 11 - i
+      const maxIndex = batteries.length - 1 - needAfter
+      const max = Math.max(...[...batteries].slice(start, maxIndex + 1))
+      const indexOfMax = batteries.indexOf(max, start)
+      largest = parseInt(`${largest}${max}`)
+      start = indexOfMax + 1
+    }
+    count += largest
+  }
+  return count
 }
-part2(useInput('input.test'))
+part2(useInput('input'))

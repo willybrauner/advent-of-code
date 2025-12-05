@@ -1,6 +1,6 @@
 /**
- * XXXX - Day X
- * https://adventofcode.com/XXXX/day/X
+ * 2025 - Day 5
+ * https://adventofcode.com/2025/day/5
  */
 import { count } from 'console'
 import fs, { read } from 'fs'
@@ -39,9 +39,33 @@ const part1 = ({ ranges, freshIds }: Input) => {
   }
   return freshCount
 }
-log(part1(useInput('input')))
+part1(useInput('input'))
 
-const part2 = (input: Input) => {
-  return input
+const part2 = ({ ranges }: Input) => {
+  ranges = ranges.sort((a, b) => a[0] - b[0])
+
+  const recurcive = (ranges: number[][]): number[][] => {
+    let keep = []
+    let i = 0
+    while (i < ranges.length) {
+      const curr = ranges[i]
+      const next = ranges?.[i + 1]
+      if (next && curr[1] >= next[0]) {
+        keep.push([curr[0], Math.max(curr[1], next[1])])
+        i += 2
+      } else {
+        keep.push(curr)
+        i++
+      }
+    }
+    if (ranges.length !== keep.length) {
+      return recurcive(keep)
+    }
+    return keep
+  }
+
+  return recurcive(ranges)
+        .reduce((acc, el) => acc + (el[1] - el[0] + 1), 0)
 }
-part2(useInput('input.test'))
+
+log(part2(useInput('input')))

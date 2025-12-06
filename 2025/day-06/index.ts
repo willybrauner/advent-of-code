@@ -37,9 +37,39 @@ const part1 = ({rows, sign}: Input) => {
   , 0)
 
 }
-log(part1(useInput('input')))
+part1(useInput('input'))
 
-const part2 = (input: Input) => {
-  return input
+// prettier-ignore
+const part2 = ({rows, sign}: Input) => {
+  let formatted = []
+  for (let y = 0; y < rows.length; y++)
+    for (let x = 0; x < rows[y].length; x++) 
+    formatted[x] = [...(formatted[x] || []), rows[y][x]]
+  
+  let final = 0
+  for (let c = 0; c<formatted.length; c++)
+  {
+    const cols = formatted[c]
+    const currSign= sign[c]
+    const maxSize = Math.max(...cols.map(e => `${e}`.length))
+    const splitToStrings = cols.map(e => `${e}`[currSign === "*" ? "padStart": "padEnd"](maxSize, ' '))
+
+     let addOrMultip = currSign === "*" ? 1 : 0
+     for (let i = maxSize-1; i>= 0; i--)
+     {
+        let num = ""
+        for(let y = 0; y < splitToStrings.length; y++)
+          num += splitToStrings[y][i]
+        
+        if (currSign === "*")
+          addOrMultip *= parseInt(num.trim())
+        else
+          addOrMultip += parseInt(num.trim()) 
+     }
+     final += addOrMultip 
+  }
+  return final
+  
 }
-part2(useInput('input.test'))
+
+log(part2(useInput('input')))

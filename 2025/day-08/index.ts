@@ -53,6 +53,10 @@ class DSU {
 }
 type Input = number[][]
 
+
+// ---------------------------------------------------------------------------------------
+
+
 const useInput = (filename: 'input.test' | 'input'): Input =>
   fs
     .readFileSync(path.resolve(__dirname, filename), 'utf8')
@@ -92,9 +96,47 @@ const part1 = (input: Input) => {
     .reduce((a, b) => a * b, 1)
 }
 
-log(part1(useInput('input')))
+part1(useInput('input'))
 
 const part2 = (input: Input) => {
-  return input
+  const keep: { i: number; j: number; distance: number }[] = []
+  // prettier-ignore
+  for (let i = 0; i < input.length; i++) {
+    const [ax, ay, az] = input[i]
+    for (let j = i + 1; j < input.length; j++) {
+      const [bx, by, bz] = input[j]
+      keep.push({
+         i, j,
+         distance: (
+              ((ax-bx) * (ax-bx))
+            + ((ay-by) * (ay-by)) 
+            + ((az-bz) * (az-bz)) 
+         )
+      })
+    }
+  }
+
+  keep
+    .sort((a, b) => a.distance - b.distance)
+    .filter((_, i) => i < 1000)
+
+  const dsu = new DSU(input.length)
+  let components = input.length
+
+  for (const { i, j } of keep) {
+    const merged = dsu.union(i, j)
+    if (merged) {
+      components -= 1
+      if (components === 1) {
+        return input[i][0] * input[j][0]
+      }
+    }
+  }
+  
+  return dsu
+    .componentSizes()
+    .sort((a, b) => b - a)
+    .slice(0, 3)
+    .reduce((a, b) => a * b, 1)
 }
-part2(useInput('input.test'))
+log(part2(useInput('input')))

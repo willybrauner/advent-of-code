@@ -4,7 +4,7 @@
  */
 import fs from 'fs'
 import path from 'path'
-import { createHash, Hash } from 'node:crypto'
+import { createHash } from 'node:crypto'
 const { log, clear } = console
 clear()
 
@@ -21,6 +21,7 @@ const part1 = (input: Input) => {
   }
   return count
 }
+log(part1(useInput('input')))
 
 const part2 = (input: Input) => {
   let count = 1

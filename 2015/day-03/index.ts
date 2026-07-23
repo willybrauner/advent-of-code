@@ -28,9 +28,35 @@ const part1 = (input: Input) => {
   }
   return grid.size
 }
-log(part1(useInput('input')))
+part1(useInput('input'))
 
 const part2 = (input: Input) => {
-  return input
+  const parseCoords = (curr: string) => curr.split(',').map((e) => parseInt(e))
+  const grid = new Set<string>()
+  const grid2 = new Set<string>()
+  let coords: string = '0,0'
+  let coords2: string = '0,0'
+  grid.add(coords)
+  grid2.add(coords2)
+
+  for (let i = 0; i < input.length; i++) {
+    const isOdd = i % 2 === 0
+    const dir = input[i]
+    const [y, x] = parseCoords(isOdd ? coords : coords2)
+    let newCoord: string
+    if (dir == '>') newCoord = `${y},${x + 1}`
+    if (dir == '<') newCoord = `${y},${x - 1}`
+    if (dir == '^') newCoord = `${y - 1},${x}`
+    if (dir == 'v') newCoord = `${y + 1},${x}`
+
+    if (isOdd) {
+      coords = newCoord
+      grid.add(coords)
+    } else {
+      coords2 = newCoord
+      grid2.add(coords2)
+    }
+  }
+  return new Set([...grid, ...grid2]).size
 }
-part2(useInput('input.test'))
+log(part2(useInput('input')))

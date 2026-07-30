@@ -14,7 +14,7 @@ type Instruction = {
   to: Coords
 }
 type Input = Instruction[]
-const useInput = (filename: 'input.test' | 'input'): Input =>
+export const useInput = (filename: 'input.test' | 'input'): Input =>
   fs
     .readFileSync(path.resolve(__dirname, filename), 'utf8')
     .split('\n')

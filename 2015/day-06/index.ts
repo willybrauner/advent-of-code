@@ -56,7 +56,6 @@ const part1 = (input: Input) => {
   const grid = createGrid()
 
   for (let { action, from, to } of input) {
-    // log({ action, from, to })
     if (action === 'turn on') {
       parseAndMute(grid, from, to, (grid, x, y) => (grid[y][x] = 1))
     }
@@ -64,24 +63,40 @@ const part1 = (input: Input) => {
       parseAndMute(grid, from, to, (grid, x, y) => (grid[y][x] = 0))
     }
     if (action === 'toggle') {
-      parseAndMute(
-        grid,
-        from,
-        to,
-        (grid, x, y) => (grid[y][x] = grid[y][x] === 0 ? 1 : 0),
-      )
+      parseAndMute(grid, from, to, (grid, x, y) => {
+        grid[y][x] = grid[y][x] === 0 ? 1 : 0
+      })
     }
   }
-
-  console.log(` ${grid.map((e) => e + `\n`)}`.replaceAll(',', ' '))
-
   return [...grid].reduce((a, b) => {
     return a + b.filter(Boolean).length
   }, 0)
 }
-log(part1(useInput('input')))
+part1(useInput('input'))
 
 const part2 = (input: Input) => {
-  return input
+  const grid = createGrid()
+
+  for (let { action, from, to } of input) {
+    if (action === 'turn on') {
+      parseAndMute(grid, from, to, (grid, x, y) => {
+        grid[y][x]++
+      })
+    }
+    if (action === 'turn off') {
+      parseAndMute(grid, from, to, (grid, x, y) => {
+        if (grid[y][x] > 0) grid[y][x]--
+      })
+    }
+    if (action === 'toggle') {
+      parseAndMute(grid, from, to, (grid, x, y) => {
+        grid[y][x] = grid[y][x] + 2
+      })
+    }
+  }
+  // console.log(` ${grid.map((e) => e + `\n`)}`.replaceAll(',', ' '))
+  return [...grid].reduce((a, b) => {
+    return a + b.reduce((a, b) => a + b, 0)
+  }, 0)
 }
-part2(useInput('input.test'))
+log(part2(useInput('input')))

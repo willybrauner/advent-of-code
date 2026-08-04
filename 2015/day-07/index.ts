@@ -12,7 +12,7 @@ type Input = {
   instruction: string
   fn: (...params: number[]) => number
   params: string[]
-  result: number
+  signal: number
 }
 
 // prettier-ignore
@@ -61,7 +61,7 @@ const useInput = (filename: 'input.test' | 'input'): Input[] =>
 
       return [
         ...a,
-        { identifier: k, instruction: op, fn, params, result: null },
+        { identifier: k, instruction: op, fn, params, signal: null },
       ]
     }, [])
 
@@ -78,16 +78,16 @@ const parts = (input: Input[]) => {
 
       const targetObj = fullInput.find((e) => e.identifier === paramIdentifier)
 
-      if (targetObj?.result) {
-        calcParams.push(targetObj.result)
+      if (targetObj?.signal) {
+        calcParams.push(targetObj.signal)
         continue
       }
-      // Restart recurcivly
-      const newP = targetObj.fn(...recursive(targetObj, fullInput))
-      calcParams.push(newP)
+
+      // push signal of compute params from the recusive call
+      calcParams.push(targetObj.fn(...recursive(targetObj, fullInput)))
     }
 
-    current.result = current.fn(...calcParams)
+    current.signal = current.fn(...calcParams)
     return calcParams
   }
 
@@ -96,16 +96,25 @@ const parts = (input: Input[]) => {
     recursive(input[i], input)
   }
 
-  const a = input.find((e) => e.identifier === 'a').result
+  // Store the part 1 a signal
+  const A = input.find((e) => e.identifier === 'a').signal
+
+  // format data before start part 2
+  input.find((e) => e.identifier === 'b').signal = A
+  for (let i = 0; i < input.length; i++) {
+    const isB = input[i].identifier === 'b'
+    input[i].signal = isB ? A : 0
+  }
+
+  // restart with new data for part 2
+  for (let i = 0; i < input.length; i++) recursive(input[i], input)
+
+  // get new A
+  const newA = input.find((e) => e.identifier === 'a').signal
 
   return {
-    // return "a"
-    part1: a,
-    //
-    part2: ''
+    part1: A,
+    part2: newA,
   }
 }
 log(parts(useInput('input')))
-
-
-

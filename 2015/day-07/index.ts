@@ -96,7 +96,7 @@ const parts = (input: Input[]) => {
     recursive(input[i], input)
   }
 
-  // Store the part 1 a signal
+  // Store the part 1 signal
   const A = input.find((e) => e.identifier === 'a').signal
 
   // format data before start part 2

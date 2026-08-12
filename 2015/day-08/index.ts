@@ -11,45 +11,62 @@ type Input = string[]
 const useInput = (filename: 'input.test' | 'input'): Input =>
   fs.readFileSync(path.resolve(__dirname, filename), 'utf8').split('\n')
 
-const part1 = (input: Input) => {
-  return input.reduce((a, b) => {
-    const splitS: string[] = b.split('')
-    // easier parsing, it's to avoid conflict between inner '"' and around string quotes "..."
-    splitS.pop()
-    splitS.shift()
+const getPart1Counts = (splitS: string[]) => {
+  // easier parsing, it's to avoid conflict between inner '"' and around string quotes "..."
+  splitS.pop()
+  splitS.shift()
 
-    // 2 counters, real string counter and after decode counter
-    let sCount: number = 2
-    let count: number = 0
+  // 2 counters, real string counter and after decode counter
+  let sCount: number = 2
+  let count: number = 0
 
-    while (splitS.length) {
-      if (splitS[0] !== '\\') {
-        sCount++
+  while (splitS.length) {
+    if (splitS[0] !== '\\') {
+      sCount++
+      count++
+      splitS.splice(0, 1)
+    } else {
+      if (splitS[1] === '\\') {
+        sCount += 2
         count++
-        splitS.splice(0, 1)
-      } else {
-        if (splitS[1] === '\\') {
-          sCount += 2
-          count++
-          splitS.splice(0, 2)
-        } else if (splitS[1] === '"') {
-          sCount += 2
-          count++
-          splitS.splice(0, 2)
-        } else if (splitS[1] === 'x') {
-          sCount += 4
-          count++
-          splitS.splice(0, 4)
-        }
+        splitS.splice(0, 2)
+      } else if (splitS[1] === '"') {
+        sCount += 2
+        count++
+        splitS.splice(0, 2)
+      } else if (splitS[1] === 'x') {
+        sCount += 4
+        count++
+        splitS.splice(0, 4)
       }
     }
-    console.log('splitS', splitS, sCount, count)
+  }
+  return { sCount, count }
+}
+
+const part1 = (input: Input) => {
+  return input.reduce((a, b) => {
+    const { sCount, count } = getPart1Counts(b.split(''))
     return a + (sCount - count)
   }, 0)
 }
-log(part1(useInput('input')))
+part1(useInput('input'))
+
+const getPart2Count = (splitS: string[]): number => {
+  let newArr = [...splitS]
+  for (let i = 0; i < splitS.length; i++) {
+    if (splitS[i] === '"') newArr.splice(i, 1, '\\"')
+    if (splitS[i] === '\\') newArr.splice(i, 1, '\\\\')
+  }
+  return `"${newArr.join('')}"`.length
+}
 
 const part2 = (input: Input) => {
-  return input
+  return input.reduce((a, b) => {
+    const { sCount: p1Count } = getPart1Counts(b.split(''))
+    const p2Count = getPart2Count(b.split(''))
+    return a + p2Count - p1Count
+  }, 0)
 }
-part2(useInput('input.test'))
+
+log(part2(useInput('input')))

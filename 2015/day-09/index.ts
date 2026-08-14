@@ -1,6 +1,10 @@
 /**
  * 2015 - Day 9
  * https://adventofcode.com/2015/day/9
+ * 
+ * Travelling Salesman Problem (TSP)
+ * "which is the best order to visit all the points"
+ * This is a "permutation" problem
  */
 import fs from 'fs'
 import path from 'path'

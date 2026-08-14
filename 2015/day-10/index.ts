@@ -13,15 +13,12 @@ const useInput = (filename: 'input.test' | 'input'): Input =>
 
 const fn = (input: Input, n: number): number => {
   let curr = input
-  for (let i = 0; i < n; i++) {
+  for (let i = 0; i < n; i++)
     curr = curr
       .match(/(.)\1*/g)
-      .map((e) => {
-        const first = e[0]
-        return e.length + first
-      })
+      .map((e) => e.length + e[0])
       .join('')
-  }
+
   return curr.length
 }
 const part1 = (input: Input) => fn(input, 40)

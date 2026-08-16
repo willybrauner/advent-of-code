@@ -55,11 +55,13 @@ const part1 = (input: Input) => {
 log(part1(useInput('input')))
 
 const part2 = (input: Input) => {
-  input.set(
-    'me',
-    [...input.keys()].reduce((acc, e) => ({ ...acc, [e]: 0 }), {}),
-  )
-  for (let el of input.keys()) input.set(el, { ...input.get(el), me: 0 })
+  // add myself to the input
+  const me = [...input.keys()].reduce((acc, e) => ({ ...acc, [e]: 0 }), {})
+  input.set('me', me)
+  for (let el of input.keys()) {
+    input.set(el, { ...input.get(el), me: 0 })
+  }
+
   return permutations([...input.keys()]).reduce((a, b, i) => {
     const count = getCount(b, input)
     if (i === 0) return count

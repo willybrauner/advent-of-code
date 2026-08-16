@@ -34,16 +34,20 @@ export const modulo = (base: number, modulo: number): number => {
   return ((base % modulo) + modulo) % modulo
 }
 
+const getCount = (b, input: Input) => {
+  let count = 0
+  for (let i = 0; i < b.length; i++) {
+    const curr = b[i]
+    const prev = b[modulo(i - 1, b.length)]
+    const next = b[modulo(i + 1, b.length)]
+    count += input.get(curr)[prev] + input.get(curr)[next]
+  }
+  return count
+}
+
 const part1 = (input: Input) => {
   return permutations([...input.keys()]).reduce((a, b, i) => {
-    let count = 0
-    for (let i = 0; i < b.length; i++) {
-      const curr = b[i]
-      const prev = b[modulo(i - 1, b.length)]
-      const next = b[modulo(i + 1, b.length)]
-      count += input.get(curr)[prev] + input.get(curr)[next]
-    }
-
+    const count = getCount(b, input)
     if (i === 0) return count
     return a < count ? count : a
   }, 0)
@@ -51,6 +55,15 @@ const part1 = (input: Input) => {
 log(part1(useInput('input')))
 
 const part2 = (input: Input) => {
-  return input
+  input.set(
+    'me',
+    [...input.keys()].reduce((acc, e) => ({ ...acc, [e]: 0 }), {}),
+  )
+  for (let el of input.keys()) input.set(el, { ...input.get(el), me: 0 })
+  return permutations([...input.keys()]).reduce((a, b, i) => {
+    const count = getCount(b, input)
+    if (i === 0) return count
+    return a < count ? count : a
+  }, 0)
 }
-part2(useInput('input.test'))
+log(part2(useInput('input')))

@@ -53,11 +53,9 @@ const part2 = (input: Input) => {
     const bestKmOnTour = [...input.values()].sort(
       (a, b) => b.kmOnTour - a.kmOnTour,
     )[0].kmOnTour
-
     for (let entry of input.entries())
       if (entry[1].kmOnTour === bestKmOnTour) entry[1].points++
   }
-
   return [...input.values()].sort((a, b) => b.points - a.points)[0].points
 }
 log(part2(useInput('input')))

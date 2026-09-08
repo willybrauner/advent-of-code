@@ -79,7 +79,12 @@ const part1 = (input: Input) => {
     return result
   }, 0)
 }
-part1(useInput('input'))
+const t1 = performance.now()
+log(
+  'part1:',
+  part1(useInput('input')),
+  `${(performance.now() - t1).toFixed(2)}ms`,
+)
 
 const part2 = (input: Input) => {
   const ingredients = Object.values(input)
@@ -107,4 +112,9 @@ const part2 = (input: Input) => {
     return multiply > a ? multiply : a
   }, 0)
 }
-log(part2(useInput('input')))
+const t2 = performance.now()
+log(
+  'part2:',
+  part2(useInput('input')),
+  `${(performance.now() - t2).toFixed(2)}ms`,
+)

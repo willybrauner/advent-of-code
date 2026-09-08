@@ -46,6 +46,24 @@ const part1 = (input: Input) => {
 log(part1(useInput('input')))
 
 const part2 = (input: Input) => {
+  for (let i = 0; i < input.length; i++) {
+    const entries = Object.entries(input[i])
+    let length = entries.length
+    for (const [linePropName, linePropValue] of entries) {
+      // prettier-ignore
+      if (
+        (linePropName === 'cats' && linePropValue > properties['cats']) ||
+        (linePropName === 'trees' && linePropValue > properties['trees']) ||
+        (linePropName === 'pomeranians' && linePropValue < properties['pomeranians']) ||
+        (linePropName === 'goldfish' && linePropValue < properties['goldfish'])
+      ) {
+        length -= 1
+      } else if (properties?.[linePropName] === linePropValue) {
+        length -= 1
+      }
+    }
+    if (length === 0) return i + 1
+  }
   return input
 }
-part2(useInput('input.test'))
+log(part2(useInput('input')))

@@ -45,7 +45,7 @@ const getPermutations = (ingredientsNbr: number, total: number): number[][] => {
       result.push([...current, restTotal])
       return
     }
-    for (let a = 0; a < total; a++) {
+    for (let a = 0; a <= restTotal; a++) {
       rec(rest - 1, restTotal - a, [...current, a])
     }
   }

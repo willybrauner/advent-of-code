@@ -38,9 +38,9 @@ const useInput = (filename: 'input.test' | 'input'): Input =>
       }
     }, {})
 
-    const part1 = (input: Input) => {
+const part1 = (input: Input) => {
   // log(input)
-  
+
   const getPermutations = (
     ingredientsNbr: number,
     total: number,
@@ -61,9 +61,7 @@ const useInput = (filename: 'input.test' | 'input'): Input =>
     return result
   }
 
-  const permutations = getPermutations(Object.keys(input).length, 100)
-  // log('permutations', permutations)
-
+  
   // group all properties
   const ingredients = Object.values(input)
   const groups = {}
@@ -73,8 +71,11 @@ const useInput = (filename: 'input.test' | 'input'): Input =>
       groups[property] = [...(groups?.[property] || []), value]
     }
   }
-
-  return permutations.reduce((a, permutation, i) => {
+  
+  const permutations = getPermutations(Object.keys(input).length, 100)
+  // log('permutations', permutations)
+  
+  return permutations.reduce((a, permutation) => {
     let arr = []
     for (let propertyValues of Object.values(groups)) {
       let v = 0

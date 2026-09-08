@@ -38,18 +38,32 @@ const useInput = (filename: 'input.test' | 'input'): Input =>
       }
     }, {})
 
-const getPermutations = (ingredientsNbr: number, total: number): number[][] => {
-  const result = []
-  const rec = (rest: number, restTotal: number, current: number[]) => {
-    if (rest === 1) {
-      result.push([...current, restTotal])
+const getPermutations = (
+  ingredientsCount: number,
+  target: number,
+): number[][] => {
+  const result: number[][] = []
+
+  const recursive = (
+    remainingIngredients: number,
+    remainingBudget: number,
+    chosenAmounts: number[],
+  ) => {
+    if (remainingIngredients === 1) {
+      result.push([...chosenAmounts, remainingBudget])
       return
     }
-    for (let a = 0; a <= restTotal; a++) {
-      rec(rest - 1, restTotal - a, [...current, a])
+    for (let amount = 0; amount <= remainingBudget; amount++) {
+      // prettier-ignore
+      recursive(
+        remainingIngredients - 1, 
+        remainingBudget - amount, 
+        [...chosenAmounts, amount]
+    )
     }
   }
-  rec(ingredientsNbr, total, [])
+
+  recursive(ingredientsCount, target, [])
   return result
 }
 

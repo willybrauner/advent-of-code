@@ -89,7 +89,6 @@ const part2 = (input: Input) => {
       groups[property] = [...(groups?.[property] || []), value]
     }
   }
-
   const permutations = getPermutations(Object.keys(input).length, 100)
   return permutations.reduce((a, permutation) => {
     let arr = []

@@ -38,30 +38,22 @@ const useInput = (filename: 'input.test' | 'input'): Input =>
       }
     }, {})
 
-const part1 = (input: Input) => {
-  // log(input)
-
-  const getPermutations = (
-    ingredientsNbr: number,
-    total: number,
-  ): number[][] => {
-    const result = []
-    const rec = (rest: number, restTotal: number, current: number[]) => {
-      // if this is the last, push the result and stop
-      if (rest === 1) {
-        result.push([...current, restTotal])
-        return
-      }
-      for (let a = 0; a < total; a++) {
-        rec(rest - 1, restTotal - a, [...current, a])
-      }
+const getPermutations = (ingredientsNbr: number, total: number): number[][] => {
+  const result = []
+  const rec = (rest: number, restTotal: number, current: number[]) => {
+    if (rest === 1) {
+      result.push([...current, restTotal])
+      return
     }
-    // start
-    rec(ingredientsNbr, total, [])
-    return result
+    for (let a = 0; a < total; a++) {
+      rec(rest - 1, restTotal - a, [...current, a])
+    }
   }
+  rec(ingredientsNbr, total, [])
+  return result
+}
 
-  
+const part1 = (input: Input) => {
   // group all properties
   const ingredients = Object.values(input)
   const groups = {}
@@ -71,10 +63,8 @@ const part1 = (input: Input) => {
       groups[property] = [...(groups?.[property] || []), value]
     }
   }
-  
+
   const permutations = getPermutations(Object.keys(input).length, 100)
-  // log('permutations', permutations)
-  
   return permutations.reduce((a, permutation) => {
     let arr = []
     for (let propertyValues of Object.values(groups)) {
@@ -89,9 +79,33 @@ const part1 = (input: Input) => {
     return result
   }, 0)
 }
-log(part1(useInput('input')))
+part1(useInput('input'))
 
 const part2 = (input: Input) => {
-  return input
+  const ingredients = Object.values(input)
+  const groups = {}
+  for (let ingredient of ingredients) {
+    for (let [property, value] of Object.entries(ingredient)) {
+      groups[property] = [...(groups?.[property] || []), value]
+    }
+  }
+
+  const permutations = getPermutations(Object.keys(input).length, 100)
+  return permutations.reduce((a, permutation) => {
+    let arr = []
+    let calories = 0
+    for (let [property, propertyValues] of Object.entries(groups)) {
+      let v = 0
+      for (let i = 0; i < permutation.length; i++) {
+        const calc = permutation[i] * propertyValues[i]
+        v += calc
+      }
+      if (property === 'calories') calories = v
+      else arr.push(v < 0 ? 0 : v)
+    }
+    if (calories !== 500) return a
+    const multiply = arr.reduce((a, b) => a * b, 1)
+    return multiply > a ? multiply : a
+  }, 0)
 }
-part2(useInput('input.test'))
+log(part2(useInput('input')))

@@ -35,6 +35,25 @@ const part1 = (input: Input) => {
 log(part1(useInput('input')))
 
 const part2 = (input: Input) => {
-  return input
+  const combinations = (values: Input, target: number) => {
+    let containersNumbers = {}
+
+    const recusive = (startIndex: number, currentCombo: number[]) => {
+      for (let i = startIndex; i < values.length; i++) {
+        const newCombo = [...currentCombo, values[i]]
+        if (newCombo.reduce((a, b) => a + b, 0) === target) {
+          containersNumbers = {
+            ...(containersNumbers|| {}),
+            [newCombo.length]: (containersNumbers?.[newCombo.length] || 0) + 1
+          }
+        }
+        recusive(i + 1, newCombo)
+      }
+    }
+    recusive(0, [])
+    return containersNumbers[Object.keys(containersNumbers).sort()[0]]
+  }
+
+  return combinations(input, 150)
 }
-part2(useInput('input.test'))
+log(part2(useInput('input')))
